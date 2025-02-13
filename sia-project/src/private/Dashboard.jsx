@@ -23,7 +23,7 @@ const MainContent = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex-1 bg-gray-100 p-6">
+    <div className="flex-1 bg-gray-100 p-6 overflow-auto">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Dashboard Overview</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <DashboardCard title="Staff Management" onClick={() => navigate('/staff-management')} />
@@ -40,9 +40,9 @@ const MainContent = () => {
 
 const Dashboard = ({ onLogout }) => {
   return (
-    <div className="flex h-screen w-screen overflow-hidden">
+    <div className="flex h-screen w-screen">
       <Sidebar />
-      <div className="flex flex-col flex-1 overflow-auto">
+      <div className="flex flex-col flex-1">
         <Navbar onLogout={onLogout} />
         <MainContent />
       </div>

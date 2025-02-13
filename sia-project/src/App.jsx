@@ -1,10 +1,11 @@
 // src/App.jsx
+
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './public/LoginPage';
 import Dashboard from './private/Dashboard';
-import StaffManagement from './private/StaffManagement/StaffManagement';
-
+import StaffMgmt from './private/StaffManagement/StaffManagement';
+import Delivery from './private/Delivery/Delivery';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -27,10 +28,12 @@ const App = () => {
           path="/dashboard"
           element={
             isLoggedIn ? (
-              <Dashboard onLogout={() => {
-                setIsLoggedIn(false);
-                localStorage.removeItem('isLoggedIn');
-              }} />
+              <Dashboard
+                onLogout={() => {
+                  setIsLoggedIn(false);
+                  localStorage.removeItem('isLoggedIn');
+                }}
+              />
             ) : (
               <Navigate to="/login" />
             )
@@ -38,13 +41,11 @@ const App = () => {
         />
         <Route
           path="/staff-management"
-          element={
-            isLoggedIn ? (
-              <StaffManagement />
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
+          element={isLoggedIn ? <StaffMgmt /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/delivery-management"
+          element={isLoggedIn ? <Delivery /> : <Navigate to="/login" />}
         />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>

@@ -1,59 +1,103 @@
-// src/private/StaffManagement/StaffManagement.jsx
+// src/private/StaffManagement/StaffMgmt.jsx
 import React, { useState } from 'react';
 import Sidebar from '../Sidebar';
-import EmployeeList from './EmployeeList';
-import AddEmployee from './AddEmployee';
-import EditEmployee from './EditEmployee';
+import List from './List';
+import AddModal from './AddModal';
+import ConfirmModal from './ConfirmModal';
 
-const StaffManagement = () => {
-  const [employees, setEmployees] = useState([]);
-  const [editingEmployee, setEditingEmployee] = useState(null);
+const StaffMgmt = () => {
+  const [employees, setEmployees] = useState([
+    {
+      id: 1,
+      name: 'John Doe',
+      role: 'Manager',
+      email: 'john@example.com',
+      contact: '123-456-7890',
+      status: 'Active',
+    },
+    {
+      id: 2,
+      name: 'Jane Smith',
+      role: 'Cashier',
+      email: 'jane@example.com',
+      contact: '987-654-3210',
+      status: 'Active',
+    },
+  ]);
 
-  const addEmployee = (employee) => {
-    setEmployees([...employees, { id: Date.now(), ...employee, status: 'Active' }]);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({ name: '', role: '', email: '', contact: '' });
+
+  const [confirmModal, setConfirmModal] = useState({
+    show: false,
+    action: '',
+    employee: null,
+  });
+
+  /* ----------------------- ADD EMPLOYEE LOGIC ----------------------- */
+  const handleChange = (e) => {
+    setNewEmployee({ ...newEmployee, [e.target.name]: e.target.value });
   };
 
-  const updateEmployee = (updatedEmployee) => {
-    setEmployees(
-      employees.map((emp) => (emp.id === updatedEmployee.id ? updatedEmployee : emp))
+  const handleAdd = () => setShowAddForm(true);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setEmployees([...employees, { id: Date.now(), ...newEmployee, status: 'Active' }]);
+    setNewEmployee({ name: '', role: '', email: '', contact: '' });
+    setShowAddForm(false);
+  };
+  const handleCancel = () => setShowAddForm(false);
+
+  /* ----------------------- SUSPEND / REMOVE LOGIC ----------------------- */
+  const toggleStatus = (id) => {
+    setEmployees((prev) =>
+      prev.map((emp) => (emp.id === id ? { ...emp, status: emp.status === 'Active' ? 'Suspended' : 'Active' } : emp))
     );
-    setEditingEmployee(null);
   };
 
-  const deleteEmployee = (id) => {
-    setEmployees(employees.filter((emp) => emp.id !== id));
-  };
+  const handleRemove = (id) => setEmployees((prev) => prev.filter((emp) => emp.id !== id));
 
-  const suspendEmployee = (id) => {
-    setEmployees(
-      employees.map((emp) =>
-        emp.id === id ? { ...emp, status: emp.status === 'Active' ? 'Suspended' : 'Active' } : emp
-      )
-    );
+  /* ----------------------- CONFIRMATION MODAL ----------------------- */
+  const confirmAction = (action, employee) => setConfirmModal({ show: true, action, employee });
+  const handleConfirm = () => {
+    if (confirmModal.action === 'toggleStatus') toggleStatus(confirmModal.employee.id);
+    if (confirmModal.action === 'remove') handleRemove(confirmModal.employee.id);
+    setConfirmModal({ show: false, action: '', employee: null });
   };
+  const handleCancelConfirm = () => setConfirmModal({ show: false, action: '', employee: null });
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen w-screen">
       <Sidebar />
-      <div className="flex-1 p-6 bg-gray-100">
+      <div className="flex-1 p-6 bg-gray-100 overflow-auto">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">Staff Management</h1>
-        <AddEmployee addEmployee={addEmployee} />
-        <EmployeeList
-          employees={employees}
-          onEdit={setEditingEmployee}
-          onDelete={deleteEmployee}
-          onSuspend={suspendEmployee}
+
+      {/* Employee Table */}
+        <div className="bg-white p-4 rounded shadow text-black">
+          <List employees={employees} confirmAction={confirmAction} />
+
+       {/* Button container - aligns the button to the left below the table */}
+          <div className="flex justify-start mt-4">
+            <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" onClick={handleAdd}>
+              Add New Employee
+            </button>
+          </div>
+        </div>
+
+        {/* Add Employee Modal */}
+        <AddModal
+          showAddForm={showAddForm}
+          newEmployee={newEmployee}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+          handleCancel={handleCancel}
         />
-        {editingEmployee && (
-          <EditEmployee
-            employee={editingEmployee}
-            updateEmployee={updateEmployee}
-            cancelEdit={() => setEditingEmployee(null)}
-          />
-        )}
+
+        {/* Confirmation Modal (Suspend/Activate/Remove) */}
+        <ConfirmModal confirmModal={confirmModal} handleConfirm={handleConfirm} handleCancelConfirm={handleCancelConfirm} />
       </div>
     </div>
   );
 };
 
-export default StaffManagement;
+export default StaffMgmt;
