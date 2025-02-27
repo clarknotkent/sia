@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './public/LoginPage';
-import Dashboard from './private/Dashboard';
-import StaffMgmt from './private/StaffManagement/StaffManagement';
-import Delivery from './private/Delivery/Delivery';
-import InventoryDashboard from './private/Inventory/InventoryDashboard'; // ✅ Keep the Inventory Module
+import LoginPage from './public/LoginPage'; // src/public/LoginPage.jsx
+import Dashboard from './private/Dashboard'; // src/private/Dashboard.jsx
+import StaffMgmt from './private/StaffManagement/StaffManagement'; // src/private/StaffManagement/StaffManagement.jsx
+import Delivery from './private/Delivery/Delivery'; // src/private/Delivery/Delivery.jsx
+import InventoryDashboard from './private/Inventory/InventoryDashboard'; // src/private/Inventory/InventoryDashboard.jsx
+import PurchasingDashboard from './private/Purchasing/PurchasingDashboard'; // src/private/purchasing/PurchasingDashboard.jsx
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -51,6 +52,10 @@ const App = () => {
         <Route
           path="/inventory-management"
           element={isLoggedIn ? <InventoryDashboard /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/purchasing"
+          element={isLoggedIn ? <PurchasingDashboard /> : <Navigate to="/login" />} // src/private/purchasing/PurchasingDashboard.jsx
         />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>

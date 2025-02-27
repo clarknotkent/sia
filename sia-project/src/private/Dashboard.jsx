@@ -1,6 +1,7 @@
 // src/private/Dashboard.jsx
+
 import React from 'react';
-import Sidebar from './Sidebar';
+import Sidebar from './Sidebar'; // src/private/Sidebar.jsx
 import { useNavigate } from 'react-router-dom';
 
 const Navbar = ({ onLogout }) => (
@@ -29,9 +30,9 @@ const MainContent = () => {
         <DashboardCard title="Staff Management" onClick={() => navigate('/staff-management')} />
         <DashboardCard title="POS Module" />
         <DashboardCard title="Ordering Module" />
-        <DashboardCard title="Purchasing Module" />
-        <DashboardCard title="Inventory Management" />
-        <DashboardCard title="Delivery Management" />
+        <DashboardCard title="Purchasing Module" onClick={() => navigate('/purchasing')} />
+        <DashboardCard title="Inventory Management" onClick={() => navigate('/inventory-management')} />
+        <DashboardCard title="Delivery Management" onClick={() => navigate('/delivery-management')} />
         <DashboardCard title="System Maintenance" />
       </div>
     </div>
@@ -41,7 +42,7 @@ const MainContent = () => {
 const Dashboard = ({ onLogout }) => {
   return (
     <div className="flex h-screen w-screen">
-      <Sidebar />
+      <Sidebar /> {/* src/private/Sidebar.jsx */}
       <div className="flex flex-col flex-1">
         <Navbar onLogout={onLogout} />
         <MainContent />

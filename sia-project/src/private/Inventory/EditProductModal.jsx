@@ -1,15 +1,16 @@
 // src/private/Inventory/EditProductModal.jsx
+
 import React, { useState } from "react";
 
-const EditProductModal = ({ medicine, onClose, onSave }) => {
-  const [editedMedicine, setEditedMedicine] = useState({ ...medicine });
+const EditProductModal = ({ product, onClose, onSave }) => {
+  const [editedProduct, setEditedProduct] = useState({ ...product });
 
   const handleChange = (e) => {
-    setEditedMedicine({ ...editedMedicine, [e.target.name]: e.target.value });
+    setEditedProduct({ ...editedProduct, [e.target.name]: e.target.value });
   };
 
   const handleSave = () => {
-    onSave(editedMedicine);
+    onSave(editedProduct);
     onClose();
   };
 
@@ -20,11 +21,105 @@ const EditProductModal = ({ medicine, onClose, onSave }) => {
 
         <table className="w-full border-collapse border border-gray-300 mb-4 flex-grow">
           <tbody>
-            <tr><td className="border px-4 py-2">Medicine Name</td><td><input type="text" name="name" value={editedMedicine.name} onChange={handleChange} className="w-full p-2 border text-gray-900 bg-white" /></td></tr>
-            <tr><td className="border px-4 py-2">Dosage Form</td><td><input type="text" name="form" value={editedMedicine.form} onChange={handleChange} className="w-full p-2 border text-gray-900 bg-white" /></td></tr>
-            <tr><td className="border px-4 py-2">Strength</td><td><input type="text" name="strength" value={editedMedicine.strength} onChange={handleChange} className="w-full p-2 border text-gray-900 bg-white" /></td></tr>
-            <tr><td className="border px-4 py-2">Stock Quantity</td><td><input type="number" name="stock" value={editedMedicine.stock} onChange={handleChange} className="w-full p-2 border text-gray-900 bg-white" /></td></tr>
-            <tr><td className="border px-4 py-2">Expiry Date</td><td><input type="date" name="expiry" value={editedMedicine.expiry} onChange={handleChange} className="w-full p-2 border text-gray-900 bg-white" /></td></tr>
+            <tr>
+              <td className="border px-4 py-2">Generic Name</td>
+              <td>
+                <input
+                  type="text"
+                  name="genericName"
+                  value={editedProduct.genericName}
+                  onChange={handleChange}
+                  className="w-full p-2 border text-gray-900 bg-white"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2">Brand Name</td>
+              <td>
+                <input
+                  type="text"
+                  name="brandName"
+                  value={editedProduct.brandName}
+                  onChange={handleChange}
+                  className="w-full p-2 border text-gray-900 bg-white"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2">Unit of Measurement</td>
+              <td>
+                <select
+                  name="unitOfMeasurement"
+                  value={editedProduct.unitOfMeasurement}
+                  onChange={handleChange}
+                  className="w-full p-2 border text-gray-900 bg-white"
+                >
+                  <option value="Tablet">Tablet</option>
+                  <option value="Capsule">Capsule</option>
+                  <option value="Bottle">Bottle</option>
+                  <option value="Syringe">Syringe</option>
+                  <option value="Box">Box</option>
+                  <option value="Ampoule">Ampoule</option>
+                  <option value="Other">Other</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2">Packing</td>
+              <td>
+                <input
+                  type="text"
+                  name="packing"
+                  value={editedProduct.packing}
+                  onChange={handleChange}
+                  className="w-full p-2 border text-gray-900 bg-white"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2">Lot Number</td>
+              <td>
+                <input
+                  type="text"
+                  name="lotNum"
+                  value={editedProduct.lotNum}
+                  onChange={handleChange}
+                  className="w-full p-2 border text-gray-900 bg-white"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2">Stock Quantity</td>
+              <td>
+                <input
+                  type="number"
+                  name="stock"
+                  value={editedProduct.inventory.stockLevel}
+                  onChange={(e) =>
+                    setEditedProduct({
+                      ...editedProduct,
+                      inventory: {
+                        ...editedProduct.inventory,
+                        stockLevel: e.target.value,
+                      },
+                    })
+                  }
+                  className="w-full p-2 border text-gray-900 bg-white"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2">Expiry Date</td>
+              <td>
+                <input
+                  type="date"
+                  name="expiryDate"
+                  value={editedProduct.expiryDate}
+                  onChange={handleChange}
+                  className="w-full p-2 border text-gray-900 bg-white"
+                />
+              </td>
+            </tr>
           </tbody>
         </table>
 

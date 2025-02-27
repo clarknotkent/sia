@@ -8,17 +8,59 @@ import AdjustStockModal from "./AdjustStockModal";
 import RemoveProductModal from "./RemoveProductModal";
 
 const InventoryDashboard = () => {
-  const [medicines, setMedicines] = useState([
-    { id: 1, name: "Paracetamol", form: "Tablet", strength: "500mg", batch: "B1234", stock: 50, expiry: "2025-06-10" },
-    { id: 2, name: "Amoxicillin", form: "Capsule", strength: "250mg", batch: "A5678", stock: 30, expiry: "2025-08-15" },
-    { id: 3, name: "Cough Syrup", form: "Syrup", strength: "100mg/5ml", batch: "C9012", stock: 20, expiry: "2025-07-20" },
+  const [products, setProducts] = useState([
+    {
+      id: 1,
+      genericName: "Paracetamol",
+      brandName: "Biogesic",
+      unitOfMeasurement: "Tablet",
+      packing: "Blister Pack",
+      lotNum: "B1234",
+      expiryDate: "2025-06-10",
+      inventory: {
+        stockLevel: 50,
+        reservedStock: 5,
+        thresholdLevel: 10,
+        lastDateUpdated: "2024-03-01",
+      },
+    },
+    {
+      id: 2,
+      genericName: "Amoxicillin",
+      brandName: "Amoxil",
+      unitOfMeasurement: "Capsule",
+      packing: "Bottle",
+      lotNum: "A5678",
+      expiryDate: "2025-08-15",
+      inventory: {
+        stockLevel: 30,
+        reservedStock: 2,
+        thresholdLevel: 5,
+        lastDateUpdated: "2024-02-28",
+      },
+    },
+    {
+      id: 3,
+      genericName: "Cough Syrup",
+      brandName: "Robitussin",
+      unitOfMeasurement: "Syrup",
+      packing: "Bottle",
+      lotNum: "C9012",
+      expiryDate: "2025-07-20",
+      inventory: {
+        stockLevel: 20,
+        reservedStock: 3,
+        thresholdLevel: 8,
+        lastDateUpdated: "2024-02-27",
+      },
+    },
   ]);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false);
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
-  const [selectedMedicine, setSelectedMedicine] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
@@ -29,19 +71,19 @@ const InventoryDashboard = () => {
 
         {/* Table Container - Matches Staff Management */}
         <div className="bg-white p-6 rounded-lg shadow-md border">
-          <ProductTable 
-            medicines={medicines} 
-            searchQuery={searchQuery} 
-            onEdit={(medicine) => {
-              setSelectedMedicine(medicine);
+          <ProductTable
+            products={products}
+            searchQuery={searchQuery}
+            onEdit={(product) => {
+              setSelectedProduct(product);
               setIsEditModalOpen(true);
             }}
-            onAdjustStock={(medicine) => {
-              setSelectedMedicine(medicine);
+            onAdjustStock={(product) => {
+              setSelectedProduct(product);
               setIsAdjustModalOpen(true);
             }}
-            onRemove={(medicine) => {
-              setSelectedMedicine(medicine);
+            onRemove={(product) => {
+              setSelectedProduct(product);
               setIsRemoveModalOpen(true);
             }}
           />
@@ -59,16 +101,51 @@ const InventoryDashboard = () => {
 
         {/* Modals */}
         {isAddModalOpen && (
-          <AddProductModal onClose={() => setIsAddModalOpen(false)} onSave={(newMed) => setMedicines([...medicines, { id: medicines.length + 1, ...newMed }])} />
+          <AddProductModal
+            onClose={() => setIsAddModalOpen(false)}
+            onSave={(newProduct) =>
+              setProducts([
+                ...products,
+                {
+                  id: products.length + 1,
+                  ...newProduct,
+                  inventory: {
+                    stockLevel: 0,
+                    reservedStock: 0,
+                    thresholdLevel: 5,
+                    lastDateUpdated: new Date().toISOString().split("T")[0],
+                  },
+                },
+              ])
+            }
+          />
         )}
-        {isEditModalOpen && selectedMedicine && (
-          <EditProductModal medicine={selectedMedicine} onClose={() => setIsEditModalOpen(false)} onSave={(updatedMed) => setMedicines(medicines.map((med) => (med.id === updatedMed.id ? updatedMed : med)))} />
+        {isEditModalOpen && selectedProduct && (
+          <EditProductModal
+            product={selectedProduct}
+            onClose={() => setIsEditModalOpen(false)}
+            onSave={(updatedProduct) =>
+              setProducts(products.map((prod) => (prod.id === updatedProduct.id ? updatedProduct : prod)))
+            }
+          />
         )}
-        {isAdjustModalOpen && selectedMedicine && (
-          <AdjustStockModal medicine={selectedMedicine} onClose={() => setIsAdjustModalOpen(false)} onSave={(updatedMed) => setMedicines(medicines.map((med) => (med.id === updatedMed.id ? updatedMed : med)))} />
+        {isAdjustModalOpen && selectedProduct && (
+          <AdjustStockModal
+            product={selectedProduct}
+            onClose={() => setIsAdjustModalOpen(false)}
+            onSave={(updatedProduct) =>
+              setProducts(products.map((prod) => (prod.id === updatedProduct.id ? updatedProduct : prod)))
+            }
+          />
         )}
-        {isRemoveModalOpen && selectedMedicine && (
-          <RemoveProductModal medicine={selectedMedicine} onClose={() => setIsRemoveModalOpen(false)} onConfirm={() => setMedicines(medicines.filter((med) => med.id !== selectedMedicine.id))} />
+        {isRemoveModalOpen && selectedProduct && (
+          <RemoveProductModal
+            product={selectedProduct}
+            onClose={() => setIsRemoveModalOpen(false)}
+            onConfirm={() =>
+              setProducts(products.filter((prod) => prod.id !== selectedProduct.id))
+            }
+          />
         )}
       </div>
     </div>
