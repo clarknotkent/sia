@@ -7,7 +7,10 @@ import Dashboard from './private/Dashboard'; // src/private/Dashboard.jsx
 import StaffMgmt from './private/StaffManagement/StaffManagement'; // src/private/StaffManagement/StaffManagement.jsx
 import Delivery from './private/Delivery/Delivery'; // src/private/Delivery/Delivery.jsx
 import InventoryDashboard from './private/Inventory/InventoryDashboard'; // src/private/Inventory/InventoryDashboard.jsx
-import PurchasingDashboard from './private/Purchasing/PurchasingDashboard'; // src/private/purchasing/PurchasingDashboard.jsx
+import PurchasingDashboard from './private/Purchasing/PurchasingDashboard'; // src/private/Purchasing/PurchasingDashboard.jsx
+import OrderingDashboard from "./private/Ordering/OrderingDashboard"; // src/private/Ordering/OrderingDashboard.jsx
+
+
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -55,7 +58,11 @@ const App = () => {
         />
         <Route
           path="/purchasing"
-          element={isLoggedIn ? <PurchasingDashboard /> : <Navigate to="/login" />} // src/private/purchasing/PurchasingDashboard.jsx
+          element={isLoggedIn ? <PurchasingDashboard /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/ordering"
+          element={isLoggedIn ? <OrderingDashboard /> : <Navigate to="/login" />}
         />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>

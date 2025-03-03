@@ -30,10 +30,10 @@ const Sidebar = () => {
         <button className={getLinkClasses('/pos-module')} onClick={() => navigate('/pos-module')}>
           POS Module
         </button>
-        <button className={getLinkClasses('/ordering-module')} onClick={() => navigate('/ordering-module')}>
+        <button className={getLinkClasses('/ordering-module')} onClick={() => navigate('/ordering')}>
           Ordering Module
         </button>
-        <button className={getLinkClasses('/purchasing')} onClick={() => navigate('/purchasing')}> {/* Fixed Path */}
+        <button className={getLinkClasses('/purchasing')} onClick={() => navigate('/purchasing')}>
           Purchasing Module
         </button>
         <button className={getLinkClasses('/inventory-management')} onClick={() => navigate('/inventory-management')}>
@@ -41,9 +41,6 @@ const Sidebar = () => {
         </button>
         <button className={getLinkClasses('/delivery-management')} onClick={() => navigate('/delivery-management')}>
           Delivery Management
-        </button>
-        <button className={getLinkClasses('/system-maintenance')} onClick={() => navigate('/system-maintenance')}>
-          System Maintenance
         </button>
       </nav>
     </div>

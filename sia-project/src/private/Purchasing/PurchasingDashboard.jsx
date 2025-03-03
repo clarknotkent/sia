@@ -1,7 +1,7 @@
 // src/private/Purchasing/PurchasingDashboard.jsx
 
 import { useState } from "react";
-import Sidebar from "../Sidebar"; // Ensure Sidebar is included
+import Sidebar from "../Sidebar"; 
 import SupplierList from "./SupplierList";
 import PurchaseRequest from "./PurchaseRequest";
 import OrderTracking from "./OrderTracking";

@@ -29,11 +29,10 @@ const MainContent = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <DashboardCard title="Staff Management" onClick={() => navigate('/staff-management')} />
         <DashboardCard title="POS Module" />
-        <DashboardCard title="Ordering Module" />
+        <DashboardCard title="Ordering Module" onClick={() => navigate('/ordering')} />
         <DashboardCard title="Purchasing Module" onClick={() => navigate('/purchasing')} />
         <DashboardCard title="Inventory Management" onClick={() => navigate('/inventory-management')} />
         <DashboardCard title="Delivery Management" onClick={() => navigate('/delivery-management')} />
-        <DashboardCard title="System Maintenance" />
       </div>
     </div>
   );
