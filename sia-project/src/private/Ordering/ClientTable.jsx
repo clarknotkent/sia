@@ -80,7 +80,7 @@ const ClientTable = () => {
                     placeholder="Search by ID or Name"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="border p-2 rounded w-1/3"
+                    className="border p-2 rounded w-1/3 bg-white text-gray-800"
                 />
                 <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                         onClick={() => openModal(null, 'add')}>

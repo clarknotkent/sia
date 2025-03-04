@@ -53,6 +53,13 @@ const QuotationTable = () => {
         closeModal();
     };
 
+    const handleSave = (updatedQuotation) => {
+        setQuotations(quotations.map(q => 
+            q.quotationID === updatedQuotation.quotationID ? updatedQuotation : q
+        ));
+        closeModal();
+    };
+
     const toggleSort = (column) => {
         if (sortColumn === column) {
             setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -69,17 +76,21 @@ const QuotationTable = () => {
                 <input
                     type="text"
                     placeholder="Search by ID or Client"
-                    className="border p-2 rounded"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    className="border p-2 rounded w-1/3 bg-white text-gray-800"
                 />
-                <select className="border p-2 rounded" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+                <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="border p-2 rounded bg-white text-gray-800"
+                >
                     <option value="">All Status</option>
                     <option value="Pending">Pending</option>
                     <option value="Approved">Approved</option>
                     <option value="Rejected">Rejected</option>
                 </select>
-                <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={() => openModal(null, 'add')}>
+                <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" onClick={() => openModal(null, 'add')}>
                     + Add Quotation
                 </button>
             </div>
@@ -112,7 +123,17 @@ const QuotationTable = () => {
 
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
-            {modalType === 'add' && <AddQuotationModal onAdd={handleAdd} onClose={closeModal} />}
+            {modalType === 'view' && selectedQuotation && (
+                <ViewQuotationModal quotation={selectedQuotation} onClose={closeModal} />
+            )}
+
+            {modalType === 'edit' && selectedQuotation && (
+                <EditQuotationModal quotation={selectedQuotation} onSave={handleSave} onClose={closeModal} />
+            )}
+
+            {modalType === 'add' && (
+                <AddQuotationModal onAdd={handleAdd} onClose={closeModal} />
+            )}
         </div>
     );
 };

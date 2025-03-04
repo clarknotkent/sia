@@ -1,0 +1,21 @@
+SIA Log 3/5/2025
+
+Completed:
+Ordering Module
+Inventory Module
+Delivery Module.
+
+In progress:
+Purchasing Module
+
+Not yet started:
+POS
+
+Additional Notes:
+General layout fixes applied to 
+Ordering, Inventory and Delivery.
+Sidebar flushed to the side except for Purchasing Module
+
+Button placement still needs work
+
+Will send to adviser for consultation.

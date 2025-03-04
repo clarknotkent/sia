@@ -180,6 +180,9 @@ const OrderTable = () => {
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
             {modalType === 'add' && <AddOrderModal onAdd={handleAdd} onClose={closeModal} />}
+            {modalType === 'view' && selectedOrder && <ViewOrderModal order={selectedOrder} onClose={closeModal} />}
+            {modalType === 'edit' && selectedOrder && <EditOrderModal order={selectedOrder} onSave={handleSave} onClose={closeModal} />}
+            {modalType === 'refund' && selectedOrder && <RefundOrderModal order={selectedOrder} onClose={closeModal} />}
         </div>
     );
 };

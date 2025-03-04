@@ -27,13 +27,13 @@ const AddQuotationModal = ({ onAdd, onClose }) => {
             <div className="bg-white p-6 rounded shadow-lg w-96">
                 <h2 className="text-xl font-bold mb-4">Add New Quotation</h2>
                 <input type="text" name="quotationID" placeholder="Quotation ID" value={formData.quotationID}
-                       onChange={handleChange} className="w-full mb-2 p-2 border rounded" />
+                       onChange={handleChange} className="w-full mb-2 p-2 border rounded bg-white text-gray-800" />
                 <input type="text" name="clientName" placeholder="Client Name" value={formData.clientName}
-                       onChange={handleChange} className="w-full mb-2 p-2 border rounded" />
+                       onChange={handleChange} className="w-full mb-2 p-2 border rounded bg-white text-gray-800" />
                 <input type="date" name="quotationDate" value={formData.quotationDate}
-                       onChange={handleChange} className="w-full mb-2 p-2 border rounded" />
+                       onChange={handleChange} className="w-full mb-2 p-2 border rounded bg-white text-gray-800" />
                 <select name="status" value={formData.status} onChange={handleChange}
-                        className="w-full mb-4 p-2 border rounded">
+                        className="w-full mb-4 p-2 border rounded bg-white text-gray-800">
                     <option value="Pending">Pending</option>
                     <option value="Approved">Approved</option>
                     <option value="Rejected">Rejected</option>
