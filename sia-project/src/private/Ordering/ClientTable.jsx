@@ -74,20 +74,26 @@ const ClientTable = () => {
     return (
         <div className="p-4 bg-white rounded shadow">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Registered Clients</h2>
+
+            {/* Search Bar and Add Button - Same layout as OrderTable */}
             <div className="flex justify-between items-center mb-4">
                 <input
                     type="text"
                     placeholder="Search by ID or Name"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="border p-2 rounded w-1/3 bg-white text-gray-800"
+                    className="border p-2 rounded bg-white text-gray-800"
+                    style={{ width: '400px' }}
                 />
-                <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                        onClick={() => openModal(null, 'add')}>
+                <button
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                    onClick={() => openModal(null, 'add')}
+                >
                     + Add New Client
                 </button>
             </div>
 
+            {/* Table */}
             <table className="w-full border-collapse border border-gray-300 text-gray-800">
                 <thead className="bg-gray-200">
                     <tr>
@@ -108,12 +114,16 @@ const ClientTable = () => {
                             <td className="border p-2">{client.name}</td>
                             <td className="border p-2">{client.licenseNo}</td>
                             <td className="border p-2 text-center space-x-2">
-                                <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                                        onClick={() => openModal(client, 'view')}>
+                                <button
+                                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                    onClick={() => openModal(client, 'view')}
+                                >
                                     View
                                 </button>
-                                <button className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                                        onClick={() => openModal(client, 'edit')}>
+                                <button
+                                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                                    onClick={() => openModal(client, 'edit')}
+                                >
                                     Edit
                                 </button>
                             </td>
@@ -124,6 +134,7 @@ const ClientTable = () => {
 
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
+            {/* Modals */}
             {modalType === 'view' && selectedClient && (
                 <ViewClientModal client={selectedClient} onClose={closeModal} />
             )}

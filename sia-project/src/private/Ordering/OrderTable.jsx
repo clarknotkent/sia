@@ -1,9 +1,7 @@
-// src/private/Ordering/OrderTable.jsx
-
 import React, { useState } from 'react';
 import ViewOrderModal from './Modals/ViewOrderModal';
 import EditOrderModal from './Modals/EditOrderModal';
-import RefundOrderModal from './Modals/RefundOrderModal';
+import RefundOrderModal from './Modals/RefundOrderModal';  // Make sure to update this file too
 import AddOrderModal from './Modals/AddOrderModal';
 import Pagination from '../../components/Pagination';
 
@@ -82,6 +80,13 @@ const OrderTable = () => {
         closeModal();
     };
 
+    const handleRefund = (refundedOrder) => {
+        setOrders(orders.map(order =>
+            order.orderID === refundedOrder.orderID ? refundedOrder : order
+        ));
+        closeModal();
+    };
+
     const statusColors = {
         Pending: 'bg-yellow-200 text-yellow-800',
         Processing: 'bg-blue-200 text-blue-800',
@@ -101,36 +106,39 @@ const OrderTable = () => {
 
     return (
         <div className="p-4 bg-white rounded shadow">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Orders</h2>
+
+            {/* Search & Filter Bar */}
             <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-800">Order Management</h2>
+                <div className="flex items-center gap-4">
+                    <input
+                        type="text"
+                        placeholder="Search by Order ID or Client Name"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="border p-2 rounded bg-white text-gray-800"
+                        style={{ width: '400px' }}
+                    />
+                    <select
+                        className="border p-2 rounded bg-white text-gray-800"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                    >
+                        <option value="">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Refunded">Refunded</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                </div>
                 <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                         onClick={() => openModal(null, 'add')}>
-                    + Create Order
+                    + Add New Order
                 </button>
             </div>
 
-            <div className="flex gap-4 mb-4">
-                <input
-                    type="text"
-                    placeholder="Search by Order ID or Client Name"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="border p-2 rounded w-1/3 bg-white text-gray-800"
-                />
-                <select
-                    className="border p-2 rounded bg-white text-gray-800"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                    <option value="">All Status</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Processing">Processing</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Refunded">Refunded</option>
-                    <option value="Cancelled">Cancelled</option>
-                </select>
-            </div>
-
+            {/* Orders Table */}
             <table className="w-full border-collapse border border-gray-300 text-sm text-gray-800">
                 <thead className="bg-gray-200">
                     <tr>
@@ -182,9 +190,10 @@ const OrderTable = () => {
             {modalType === 'add' && <AddOrderModal onAdd={handleAdd} onClose={closeModal} />}
             {modalType === 'view' && selectedOrder && <ViewOrderModal order={selectedOrder} onClose={closeModal} />}
             {modalType === 'edit' && selectedOrder && <EditOrderModal order={selectedOrder} onSave={handleSave} onClose={closeModal} />}
-            {modalType === 'refund' && selectedOrder && <RefundOrderModal order={selectedOrder} onClose={closeModal} />}
+            {modalType === 'refund' && selectedOrder && <RefundOrderModal order={selectedOrder} onRefund={handleRefund} onClose={closeModal} />}
         </div>
     );
 };
 
 export default OrderTable;
+

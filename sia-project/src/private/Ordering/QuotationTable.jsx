@@ -21,7 +21,7 @@ const QuotationTable = () => {
 
     const filtered = quotations.filter(q =>
         (q.quotationID.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        q.clientName.toLowerCase().includes(searchTerm.toLowerCase())) &&
+            q.clientName.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (statusFilter ? q.status === statusFilter : true)
     );
 
@@ -54,7 +54,7 @@ const QuotationTable = () => {
     };
 
     const handleSave = (updatedQuotation) => {
-        setQuotations(quotations.map(q => 
+        setQuotations(quotations.map(q =>
             q.quotationID === updatedQuotation.quotationID ? updatedQuotation : q
         ));
         closeModal();
@@ -72,65 +72,92 @@ const QuotationTable = () => {
     return (
         <div className="p-4 bg-white rounded shadow">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Quotations</h2>
+
+            {/* Search & Filter Bar */}
             <div className="flex justify-between items-center mb-4">
-                <input
-                    type="text"
-                    placeholder="Search by ID or Client"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="border p-2 rounded w-1/3 bg-white text-gray-800"
-                />
-                <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="border p-2 rounded bg-white text-gray-800"
+                <div className="flex items-center gap-4">
+                    <input
+                        type="text"
+                        placeholder="Search by ID or Client"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="border p-2 rounded bg-white text-gray-800"
+                        style={{ width: '400px' }}
+                    />
+                    <select
+                        className="border p-2 rounded bg-white text-gray-800"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                    >
+                        <option value="">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+                <button
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                    onClick={() => openModal(null, 'add')}
                 >
-                    <option value="">All Status</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Rejected">Rejected</option>
-                </select>
-                <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" onClick={() => openModal(null, 'add')}>
                     + Add Quotation
                 </button>
             </div>
 
+            {/* Table */}
             <table className="w-full border-collapse border border-gray-300 text-gray-800">
                 <thead className="bg-gray-200">
                     <tr>
-                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('quotationID')}>Quotation ID</th>
-                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('clientName')}>Client</th>
-                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('quotationDate')}>Date</th>
+                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('quotationID')}>
+                            Quotation ID
+                        </th>
+                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('clientName')}>
+                            Client
+                        </th>
+                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('quotationDate')}>
+                            Date
+                        </th>
                         <th className="border p-2">Status</th>
-                        <th className="border p-2">Actions</th>
+                        <th className="border p-2 text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {paginated.map(q => (
-                        <tr key={q.quotationID}>
+                        <tr key={q.quotationID} className="hover:bg-gray-100">
                             <td className="border p-2">{q.quotationID}</td>
                             <td className="border p-2">{q.clientName}</td>
                             <td className="border p-2">{q.quotationDate}</td>
                             <td className="border p-2">{q.status}</td>
-                            <td className="border p-2 space-x-2">
-                                <button className="bg-blue-500 text-white px-2 py-1 rounded" onClick={() => openModal(q, 'view')}>View</button>
-                                <button className="bg-green-500 text-white px-2 py-1 rounded" onClick={() => openModal(q, 'edit')}>Edit</button>
+                            <td className="border p-2 text-center">
+                                <div className="flex justify-center items-center space-x-2">
+                                    <button
+                                        className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                        onClick={() => openModal(q, 'view')}
+                                    >
+                                        View
+                                    </button>
+                                    <button
+                                        className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                                        onClick={() => openModal(q, 'edit')}
+                                    >
+                                        Edit
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
+            {/* Pagination */}
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
+            {/* Modals */}
             {modalType === 'view' && selectedQuotation && (
                 <ViewQuotationModal quotation={selectedQuotation} onClose={closeModal} />
             )}
-
             {modalType === 'edit' && selectedQuotation && (
                 <EditQuotationModal quotation={selectedQuotation} onSave={handleSave} onClose={closeModal} />
             )}
-
             {modalType === 'add' && (
                 <AddQuotationModal onAdd={handleAdd} onClose={closeModal} />
             )}
