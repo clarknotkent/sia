@@ -19,3 +19,6 @@ Sidebar flushed to the side except for Purchasing Module
 Button placement still needs work
 
 Will send to adviser for consultation.
+SIA Log 3/6/2025
+
+Minor fixes to Ordering Module
