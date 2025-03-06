@@ -1,5 +1,3 @@
-// src/private/Ordering/OrderingDashboard.jsx
-
 import React, { useState } from "react";
 import Sidebar from "../Sidebar";
 import ClientTable from "./ClientTable";
@@ -11,9 +9,9 @@ const OrderingDashboard = () => {
 
     return (
         <div className="flex h-screen w-screen">
-            <Sidebar /> {/* Flushed hard left */}
+            <Sidebar />
             <div className="flex-1 p-6 bg-gray-100 overflow-auto">
-                <h1 className="text-3xl font-bold text-gray-800 mb-4">Ordering Management</h1>
+                <h1 className="text-3xl font-bold text-gray-800 mb-4">Order Management</h1>
 
                 {/* Tab Navigation */}
                 <div className="flex gap-4 mb-4">
@@ -37,12 +35,10 @@ const OrderingDashboard = () => {
                     </button>
                 </div>
 
-                {/* Main Content - Table Container */}
-                <div className="bg-white p-6 rounded-lg shadow-md border">
-                    {activeTab === "clients" && <ClientTable />}
-                    {activeTab === "quotations" && <QuotationTable />}
-                    {activeTab === "orders" && <OrderTable />}
-                </div>
+                {/* Directly Render Tables (they handle their own containers now) */}
+                {activeTab === "clients" && <ClientTable />}
+                {activeTab === "quotations" && <QuotationTable />}
+                {activeTab === "orders" && <OrderTable />}
             </div>
         </div>
     );

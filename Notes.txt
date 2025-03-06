@@ -19,6 +19,27 @@ Sidebar flushed to the side except for Purchasing Module
 Button placement still needs work
 
 Will send to adviser for consultation.
+
 SIA Log 3/6/2025
 
-Minor fixes to Ordering Module
+Completed:
+Basic features of the following:
+Ordering Module
+Inventory Module
+Delivery Module.
+Purchasing Module
+
+Not yet started:
+POS
+
+Additional Notes:
+Applied layout fixes to all subsystems.
+Button placement fixes applied.
+
+Added Search, dropdown and pagination to Inventory Module.
+Will add to Delivery. 
+
+
+
+
+

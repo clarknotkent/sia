@@ -31,7 +31,7 @@ const Sidebar = () => {
           POS Module
         </button>
         <button className={getLinkClasses('/ordering-module')} onClick={() => navigate('/ordering')}>
-          Ordering Module
+          Order Management
         </button>
         <button className={getLinkClasses('/purchasing')} onClick={() => navigate('/purchasing')}>
           Purchasing Module
