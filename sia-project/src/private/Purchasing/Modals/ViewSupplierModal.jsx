@@ -1,3 +1,4 @@
+//src/private/Purchasing/Modals/ViewSupplierModal.jsx
 import React from 'react';
 
 const ViewSupplierModal = ({ supplier, onClose }) => (
@@ -8,7 +9,7 @@ const ViewSupplierModal = ({ supplier, onClose }) => (
             <p><strong>Name:</strong> {supplier.name}</p>
             <p><strong>Contact Person:</strong> {supplier.contactPerson}</p>
             <p><strong>Contact Number:</strong> {supplier.contactNumber}</p>
-            <button className="mt-4 bg-gray-500 text-white px-4 py-2 rounded" onClick={onClose}>Close</button>
+            <button className="mt-4 bg-red-500 text-white px-4 py-2 rounded" onClick={onClose}>Close</button>
         </div>
     </div>
 );

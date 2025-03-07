@@ -11,7 +11,7 @@ const ViewQuotationModal = ({ quotation, onClose }) => {
                 <p className="text-gray-800"><strong>Client:</strong> {quotation.clientName}</p>
                 <p className="text-gray-800"><strong>Date:</strong> {quotation.quotationDate}</p>
                 <div className="mt-4 flex justify-end">
-                    <button className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" onClick={onClose}>Close</button>
+                    <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-gray-600" onClick={onClose}>Close</button>
                 </div>
             </div>
         </div>

@@ -1,3 +1,4 @@
+//src/private/Purchasing/PurchaseOrdersTable.jsx
 import React, { useState } from 'react';
 import ViewPurchaseOrderModal from './Modals/ViewPurchaseOrderModal';
 import EditPurchaseOrderModal from './Modals/EditPurchaseOrderModal';
@@ -139,6 +140,11 @@ const PurchaseOrdersTable = () => {
             </table>
 
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+
+            {/* Modals */}
+            {modalType === 'add' && <AddPurchaseOrderModal onAdd={handleAdd} onClose={closeModal} />}
+            {modalType === 'view' && selectedPO && <ViewPurchaseOrderModal po={selectedPO} onClose={closeModal} />}
+            {modalType === 'edit' && selectedPO && <EditPurchaseOrderModal po={selectedPO} onSave={handleSave} onClose={closeModal} />}
         </>
     );
 };

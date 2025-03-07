@@ -9,8 +9,7 @@ import Delivery from './private/Delivery/Delivery'; // src/private/Delivery/Deli
 import InventoryDashboard from './private/Inventory/InventoryDashboard'; // src/private/Inventory/InventoryDashboard.jsx
 import PurchasingDashboard from './private/Purchasing/PurchasingDashboard'; // src/private/Purchasing/PurchasingDashboard.jsx
 import OrderingDashboard from "./private/Ordering/OrderingDashboard"; // src/private/Ordering/OrderingDashboard.jsx
-
-
+import POSModule from "./private/POS/POSDashboard"; ///private/POS/POSDashboard.jsx
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -63,6 +62,10 @@ const App = () => {
         <Route
           path="/ordering"
           element={isLoggedIn ? <OrderingDashboard /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/pos-module"
+          element={isLoggedIn ? <POSModule /> : <Navigate to="/login" />}
         />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>

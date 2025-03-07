@@ -28,11 +28,11 @@ const MainContent = () => {
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Dashboard Overview</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <DashboardCard title="Staff Management" onClick={() => navigate('/staff-management')} />
-        <DashboardCard title="POS" />
-        <DashboardCard title="Orders" onClick={() => navigate('/ordering')} />
-        <DashboardCard title="Purchasing" onClick={() => navigate('/purchasing')} />
-        <DashboardCard title="Inventory" onClick={() => navigate('/inventory-management')} />
-        <DashboardCard title="Delivery" onClick={() => navigate('/delivery-management')} />
+        <DashboardCard title="POS Module" onClick={() => navigate('/pos-module')} />
+        <DashboardCard title="Order Management" onClick={() => navigate('/ordering')} />
+        <DashboardCard title="Purchasing Module" onClick={() => navigate('/purchasing')} />
+        <DashboardCard title="Inventory Management" onClick={() => navigate('/inventory-management')} />
+        <DashboardCard title="Delivery Management" onClick={() => navigate('/delivery-management')} />
       </div>
     </div>
   );

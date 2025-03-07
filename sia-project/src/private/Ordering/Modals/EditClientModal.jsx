@@ -21,7 +21,7 @@ const EditClientModal = ({ client, onSave, onClose }) => {
                 <input className="border p-2 w-full mb-4 bg-white text-gray-800" name="licenseNo" value={formData.licenseNo} onChange={handleChange} placeholder="License No" />
                 <div className="mt-4 flex justify-end space-x-2">
                     <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" onClick={handleSubmit}>Save</button>
-                    <button className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600" onClick={onClose}>Cancel</button>
+                    <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-gray-600" onClick={onClose}>Cancel</button>
                 </div>
             </div>
         </div>

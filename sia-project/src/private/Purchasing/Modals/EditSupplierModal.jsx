@@ -1,3 +1,4 @@
+//src/private/Purchasing/Modals/EditSupplierModal.jsx
 import React, { useState } from 'react';
 
 const EditSupplierModal = ({ supplier, onSave, onClose }) => {

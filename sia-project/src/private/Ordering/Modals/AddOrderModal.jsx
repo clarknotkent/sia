@@ -42,7 +42,7 @@ const AddOrderModal = ({ onAdd, onClose }) => {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white p-6 rounded shadow-lg w-96">
-                <h2 className="text-xl font-bold mb-4">Create New Order</h2>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Create New Order</h2>
                 <div className="space-y-2">
                     <input type="text" name="orderID" placeholder="Order ID" value={formData.orderID} onChange={handleChange}
                            className="w-full p-2 border rounded bg-white text-gray-800" />
@@ -67,8 +67,8 @@ const AddOrderModal = ({ onAdd, onClose }) => {
                            className="w-full p-2 border rounded bg-white text-gray-800" />
                 </div>
                 <div className="mt-4 flex justify-end space-x-2">
-                    <button className="bg-gray-400 text-white px-4 py-2 rounded" onClick={onClose}>Cancel</button>
                     <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleSubmit}>Save</button>
+                    <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={onClose}>Cancel</button>
                 </div>
             </div>
         </div>

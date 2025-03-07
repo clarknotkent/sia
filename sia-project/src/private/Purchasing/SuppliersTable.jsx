@@ -1,3 +1,4 @@
+//src/private/Purchasing/SuppliersTable.jsx
 import React, { useState } from 'react';
 import ViewSupplierModal from './Modals/ViewSupplierModal';
 import EditSupplierModal from './Modals/EditSupplierModal';

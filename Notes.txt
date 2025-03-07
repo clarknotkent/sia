@@ -26,7 +26,7 @@ Completed:
 Basic features of the following:
 Ordering Module
 Inventory Module
-Delivery Module.
+Delivery Module
 Purchasing Module
 
 Not yet started:
@@ -39,7 +39,21 @@ Button placement fixes applied.
 Added Search, dropdown and pagination to Inventory Module.
 Will add to Delivery. 
 
+SIA Log 3/8/2025
 
+Completed the following:
+Ordering Module
+Inventory Module
+Delivery Module
+Purchasing Module
+
+Started with POS
+Only placeholder codes for now
+Will continue by Sunday
+
+Additional Notes:
+Applied layout fixes to all subsystems including button placements, colors and etc.
+Added Paginations, search and filter features among all subsystems that require it.
 
 
 
