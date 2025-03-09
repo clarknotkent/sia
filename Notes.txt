@@ -53,7 +53,7 @@ Will continue by Sunday
 
 Additional Notes:
 Applied layout fixes to all subsystems including button placements, colors and etc.
-Added Paginations, search and filter features among all subsystems that require it.
+Added Paginations, search and filter features to all subsystems that require it.
 
 
 
