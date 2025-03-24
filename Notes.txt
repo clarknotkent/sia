@@ -1,3 +1,16 @@
+Supply Chain Management System for Healthkey Pharma
+This repository is for the frontend. The dates below are my progress tracker. 
+Sidenote: Other versions and the backups are on my personal computer. Everything here is essentially the latest version.
+
+Instructions:
+Clone the repo
+-Navigate to sia-project
+-npm install
+-npm run dev
+
+username: admin
+password: admin123
+
 SIA Log 3/5/2025
 
 Completed:
@@ -34,10 +47,10 @@ POS
 
 Additional Notes:
 Applied layout fixes to all subsystems.
-Button placement fixes applied.
+Button placement fixes were applied.
 
-Added Search, dropdown and pagination to Inventory Module.
-Will add to Delivery. 
+Added Search, dropdown, and pagination to Inventory Module.
+Will add it to Delivery. 
 
 SIA Log 3/8/2025
 
@@ -55,5 +68,10 @@ Additional Notes:
 Applied layout fixes to all subsystems including button placements, colors and etc.
 Added Paginations, search and filter features among all subsystems that require it.
 
+SIA Log 3/24/2025
+Completed POS Module, including checkout and print functions.
 
-
+SIA Log 3/25/2025
+Frontend 95% complete.
+Fixes include - Dashboard overhaul.
+Will consult for any additional requirements.
