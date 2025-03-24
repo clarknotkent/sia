@@ -8,6 +8,7 @@ Clone the repo
 -npm install
 -npm run dev
 
+Live site: https://clarknotkent.github.io/sia/
 username: admin
 password: admin123
 
