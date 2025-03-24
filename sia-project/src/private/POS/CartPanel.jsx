@@ -1,7 +1,7 @@
 // src/private/POS/CartPanel.jsx
 import React from 'react';
 
-const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onHold, onProceed }) => {
+const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onHold, onProceed, onClear }) => {
   const subtotal = cartItems.reduce(
     (total, item) => total + item.price * item.quantity * (1 - item.discount / 100),
     0
@@ -19,7 +19,6 @@ const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onHold, onProceed })
         <div className="space-y-4">
           {cartItems.map((item, index) => (
             <div key={index} className="border p-2 rounded relative">
-              {/* Remove "X" button */}
               <button
                 className="absolute top-1 right-2 text-gray-500 hover:text-red-600 text-xl font-semibold bg-transparent"
                 onClick={() => onRemoveItem(index)}
@@ -54,31 +53,39 @@ const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onHold, onProceed })
       <div className="mt-6 border-t pt-4 space-y-1 text-sm">
         <div className="flex justify-between">
           <span>Subtotal:</span>
-          <span>₱{subtotal.toFixed(2)}</span>
+          <span>₱ {subtotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between">
           <span>Tax (12%):</span>
-          <span>₱{tax.toFixed(2)}</span>
+          <span>₱ {tax.toFixed(2)}</span>
         </div>
         <div className="flex justify-between font-semibold">
           <span>Total:</span>
-          <span>₱{total.toFixed(2)}</span>
+          <span>₱ {total.toFixed(2)}</span>
         </div>
       </div>
 
-      <div className="mt-6 flex justify-between space-x-2">
+      <div className="mt-6 flex flex-col gap-2">
         <button
-          className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded w-full"
-          onClick={onHold}
+          className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded w-full"
+          onClick={onClear}
         >
-          Hold Order
+          Clear Cart
         </button>
-        <button
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full"
-          onClick={onProceed}
-        >
-          Proceed
-        </button>
+        <div className="flex gap-2">
+          <button
+            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded w-full"
+            onClick={onHold}
+          >
+            Hold Order
+          </button>
+          <button
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full"
+            onClick={onProceed}
+          >
+            Checkout
+          </button>
+        </div>
       </div>
     </div>
   );

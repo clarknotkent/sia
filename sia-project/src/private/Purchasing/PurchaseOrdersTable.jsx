@@ -19,11 +19,11 @@ const PurchaseOrdersTable = () => {
     const pageSize = 5;
 
     const filtered = purchaseOrders.filter(po =>
-        (po.poID.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        po.supplier.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        ((po.poID || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+         (po.supplier || "").toLowerCase().includes(searchTerm.toLowerCase())) &&
         (statusFilter ? po.status === statusFilter : true)
     );
-
+    
     const sorted = [...filtered].sort((a, b) => {
         if (!sortColumn) return 0;
         const aValue = a[sortColumn];
