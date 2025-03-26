@@ -8,8 +8,40 @@ import Pagination from '../../components/Pagination';
 
 const QuotationTable = () => {
     const [quotations, setQuotations] = useState([
-        { quotationID: 'Q001', clientName: 'ABC Pharmacy', quotationDate: '2025-03-01', status: 'Pending' },
-        { quotationID: 'Q002', clientName: 'XYZ Drugstore', quotationDate: '2025-03-02', status: 'Approved' },
+        {
+            quotationID: 'Q001',
+            quotationDate: '2025-03-01',
+            status: 'Pending',
+            totalAmount: 5000.00,
+            client: {
+                name: 'ABC Pharmacy',
+                licenseNo: 'FDA12345',
+                contactPerson: 'Jane Dela Cruz',
+                contactNumber: '0917-123-4567',
+                email: 'abc@pharmacy.com',
+            },
+            items: [
+                { name: 'Paracetamol', quantity: 10, unitPrice: 20.00 },
+                { name: 'Ibuprofen', quantity: 5, unitPrice: 35.00 },
+            ],
+        },
+        {
+            quotationID: 'Q002',
+            quotationDate: '2025-03-02',
+            status: 'Approved',
+            totalAmount: 8900.00,
+            client: {
+                name: 'XYZ Drugstore',
+                licenseNo: 'FDA67890',
+                contactPerson: 'Mark Santos',
+                contactNumber: '0918-456-7890',
+                email: 'xyz@drugstore.com',
+            },
+            items: [
+                { name: 'Amoxicillin', quantity: 8, unitPrice: 50.00 },
+                { name: 'Cough Syrup', quantity: 4, unitPrice: 75.00 },
+            ],
+        }
     ]);
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -21,7 +53,7 @@ const QuotationTable = () => {
 
     const filtered = quotations.filter(q =>
         (q.quotationID.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            q.clientName.toLowerCase().includes(searchTerm.toLowerCase())) &&
+            q.client?.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (statusFilter ? q.status === statusFilter : true)
     );
 
@@ -58,6 +90,13 @@ const QuotationTable = () => {
             q.quotationID === updatedQuotation.quotationID ? updatedQuotation : q
         ));
         closeModal();
+    };
+
+    const handleRemove = (quotationID) => {
+        const confirmed = window.confirm("Are you sure you want to remove this quotation?");
+        if (confirmed) {
+            setQuotations(prev => prev.filter(q => q.quotationID !== quotationID));
+        }
     };
 
     const toggleSort = (column) => {
@@ -104,18 +143,13 @@ const QuotationTable = () => {
             </div>
 
             {/* Table */}
-            <table className="w-full border-collapse border border-gray-300 text-gray-800">
+            <table className="w-full border-collapse border border-gray-300 text-gray-800 text-sm">
                 <thead className="bg-gray-200">
                     <tr>
-                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('quotationID')}>
-                            Quotation ID
-                        </th>
-                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('clientName')}>
-                            Client
-                        </th>
-                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('quotationDate')}>
-                            Date
-                        </th>
+                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('quotationID')}>Quotation ID</th>
+                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('clientName')}>Client</th>
+                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('quotationDate')}>Date</th>
+                        <th className="border p-2 text-right">Total</th>
                         <th className="border p-2">Status</th>
                         <th className="border p-2 text-center">Actions</th>
                     </tr>
@@ -124,8 +158,9 @@ const QuotationTable = () => {
                     {paginated.map(q => (
                         <tr key={q.quotationID} className="hover:bg-gray-100">
                             <td className="border p-2">{q.quotationID}</td>
-                            <td className="border p-2">{q.clientName}</td>
+                            <td className="border p-2">{q.client?.name}</td>
                             <td className="border p-2">{q.quotationDate}</td>
+                            <td className="border p-2 text-right">₱{q.totalAmount?.toLocaleString()}</td>
                             <td className="border p-2">{q.status}</td>
                             <td className="border p-2 text-center">
                                 <div className="flex justify-center items-center space-x-2">
@@ -140,6 +175,12 @@ const QuotationTable = () => {
                                         onClick={() => openModal(q, 'edit')}
                                     >
                                         Edit
+                                    </button>
+                                    <button
+                                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                                        onClick={() => handleRemove(q.quotationID)}
+                                    >
+                                        Remove
                                     </button>
                                 </div>
                             </td>

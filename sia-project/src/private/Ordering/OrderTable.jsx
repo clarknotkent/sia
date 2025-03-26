@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ViewOrderModal from './Modals/ViewOrderModal';
 import EditOrderModal from './Modals/EditOrderModal';
-import RefundOrderModal from './Modals/RefundOrderModal';  // Make sure to update this file too
+import RefundOrderModal from './Modals/RefundOrderModal';
 import AddOrderModal from './Modals/AddOrderModal';
 import Pagination from '../../components/Pagination';
 
@@ -9,23 +9,42 @@ const OrderTable = () => {
     const [orders, setOrders] = useState([
         {
             orderID: 'O001',
-            clientName: 'ABC Pharmacy',
             orderDate: '2025-03-01',
             totalAmount: 5000,
             remainingBalance: 0,
             status: 'Pending',
             employee: 'John Doe',
             quotationID: 'Q001',
+            client: {
+                name: 'ABC Pharmacy',
+                contactPerson: 'Jane Dela Cruz',
+                contactNumber: '0917-123-4567',
+                email: 'abc@pharmacy.com',
+                licenseNo: 'FDA12345',
+            },
+            items: [
+                { name: 'Paracetamol', quantity: 10, unitPrice: 20 },
+                { name: 'Amoxicillin', quantity: 5, unitPrice: 60 },
+            ],
         },
         {
             orderID: 'O002',
-            clientName: 'XYZ Drugstore',
             orderDate: '2025-03-02',
             totalAmount: 8000,
             remainingBalance: 2000,
             status: 'Processing',
             employee: 'Jane Smith',
             quotationID: null,
+            client: {
+                name: 'XYZ Drugstore',
+                contactPerson: 'Mark Santos',
+                contactNumber: '0918-456-7890',
+                email: 'xyz@drugstore.com',
+                licenseNo: 'FDA67890',
+            },
+            items: [
+                { name: 'Ibuprofen', quantity: 12, unitPrice: 40 },
+            ],
         },
     ]);
 
@@ -38,7 +57,7 @@ const OrderTable = () => {
 
     const filteredOrders = orders.filter(order =>
         (order.orderID.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.clientName.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        order.client?.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
         (statusFilter ? order.status === statusFilter : true)
     );
 
@@ -85,6 +104,13 @@ const OrderTable = () => {
             order.orderID === refundedOrder.orderID ? refundedOrder : order
         ));
         closeModal();
+    };
+
+    const handleRemove = (orderID) => {
+        const confirmed = window.confirm('Are you sure you want to remove this order?');
+        if (confirmed) {
+            setOrders(prev => prev.filter(o => o.orderID !== orderID));
+        }
     };
 
     const statusColors = {
@@ -142,10 +168,10 @@ const OrderTable = () => {
             <table className="w-full border-collapse border border-gray-300 text-sm text-gray-800">
                 <thead className="bg-gray-200">
                     <tr>
-                        <th className="border p-2 text-left cursor-pointer" onClick={() => toggleSort('orderID')}>Order ID</th>
-                        <th className="border p-2 text-left cursor-pointer" onClick={() => toggleSort('clientName')}>Client</th>
-                        <th className="border p-2 text-left cursor-pointer" onClick={() => toggleSort('orderDate')}>Order Date</th>
-                        <th className="border p-2 text-left cursor-pointer" onClick={() => toggleSort('totalAmount')}>Total Amount</th>
+                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('orderID')}>Order ID</th>
+                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('client')}>Client</th>
+                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('orderDate')}>Order Date</th>
+                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('totalAmount')}>Total Amount</th>
                         <th className="border p-2">Remaining Balance</th>
                         <th className="border p-2">Status</th>
                         <th className="border p-2">Employee</th>
@@ -157,7 +183,7 @@ const OrderTable = () => {
                     {paginatedOrders.map((order) => (
                         <tr key={order.orderID} className="hover:bg-gray-100">
                             <td className="border p-2">{order.orderID}</td>
-                            <td className="border p-2">{order.clientName}</td>
+                            <td className="border p-2">{order.client?.name}</td>
                             <td className="border p-2">{order.orderDate}</td>
                             <td className="border p-2">₱{order.totalAmount.toLocaleString()}</td>
                             <td className="border p-2">₱{order.remainingBalance.toLocaleString()}</td>
@@ -166,7 +192,7 @@ const OrderTable = () => {
                             </td>
                             <td className="border p-2">{order.employee}</td>
                             <td className="border p-2">{order.quotationID || '—'}</td>
-                            <td className="border p-2 text-center space-x-2">
+                            <td className="border p-2 text-center space-x-1">
                                 <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                                         onClick={() => openModal(order, 'view')}>
                                     View
@@ -179,6 +205,10 @@ const OrderTable = () => {
                                         onClick={() => openModal(order, 'refund')}>
                                     Refund
                                 </button>
+                                <button className="bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700"
+                                        onClick={() => handleRemove(order.orderID)}>
+                                    Remove
+                                </button>
                             </td>
                         </tr>
                     ))}
@@ -187,6 +217,7 @@ const OrderTable = () => {
 
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
+            {/* Modals */}
             {modalType === 'add' && <AddOrderModal onAdd={handleAdd} onClose={closeModal} />}
             {modalType === 'view' && selectedOrder && <ViewOrderModal order={selectedOrder} onClose={closeModal} />}
             {modalType === 'edit' && selectedOrder && <EditOrderModal order={selectedOrder} onSave={handleSave} onClose={closeModal} />}
@@ -196,4 +227,3 @@ const OrderTable = () => {
 };
 
 export default OrderTable;
-

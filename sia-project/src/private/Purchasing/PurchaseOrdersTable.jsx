@@ -1,4 +1,4 @@
-//src/private/Purchasing/PurchaseOrdersTable.jsx
+// src/private/Purchasing/PurchaseOrdersTable.jsx
 import React, { useState } from 'react';
 import ViewPurchaseOrderModal from './Modals/ViewPurchaseOrderModal';
 import EditPurchaseOrderModal from './Modals/EditPurchaseOrderModal';
@@ -7,8 +7,8 @@ import Pagination from '../../components/Pagination';
 
 const PurchaseOrdersTable = () => {
     const [purchaseOrders, setPurchaseOrders] = useState([
-        { poID: 'PO001', supplier: 'MediSupply Co.', orderDate: '2025-03-01', status: 'Pending' },
-        { poID: 'PO002', supplier: 'PharmaDirect', orderDate: '2025-03-02', status: 'Delivered' },
+        { poID: 'PO001', supplier: 'MediSupply Co.', orderDate: '2025-03-01', status: 'Pending', items: [] },
+        { poID: 'PO002', supplier: 'PharmaDirect', orderDate: '2025-03-02', status: 'Delivered', items: [] },
     ]);
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -23,7 +23,7 @@ const PurchaseOrdersTable = () => {
          (po.supplier || "").toLowerCase().includes(searchTerm.toLowerCase())) &&
         (statusFilter ? po.status === statusFilter : true)
     );
-    
+
     const sorted = [...filtered].sort((a, b) => {
         if (!sortColumn) return 0;
         const aValue = a[sortColumn];
@@ -42,7 +42,7 @@ const PurchaseOrdersTable = () => {
 
     const openModal = (po, type) => {
         setSelectedPO(po);
-        setModalType(type);
+        setModalType(type);  // Set the modal type to 'view', 'edit', etc.
     };
 
     const closeModal = () => {
@@ -110,9 +110,15 @@ const PurchaseOrdersTable = () => {
             <table className="w-full border-collapse border border-gray-300 text-sm text-gray-800">
                 <thead className="bg-gray-200">
                     <tr>
-                        <th className="border p-2 text-left cursor-pointer" onClick={() => toggleSort('poID')}>PO ID</th>
-                        <th className="border p-2 text-left cursor-pointer" onClick={() => toggleSort('supplier')}>Supplier</th>
-                        <th className="border p-2 text-left cursor-pointer" onClick={() => toggleSort('orderDate')}>Order Date</th>
+                        <th className="border p-2 text-left cursor-pointer" onClick={() => toggleSort('poID')}>
+                            PO ID
+                        </th>
+                        <th className="border p-2 text-left cursor-pointer" onClick={() => toggleSort('supplier')}>
+                            Supplier
+                        </th>
+                        <th className="border p-2 text-left cursor-pointer" onClick={() => toggleSort('orderDate')}>
+                            Order Date
+                        </th>
                         <th className="border p-2">Status</th>
                         <th className="border p-2 text-center">Actions</th>
                     </tr>
@@ -142,9 +148,9 @@ const PurchaseOrdersTable = () => {
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
             {/* Modals */}
-            {modalType === 'add' && <AddPurchaseOrderModal onAdd={handleAdd} onClose={closeModal} />}
-            {modalType === 'view' && selectedPO && <ViewPurchaseOrderModal po={selectedPO} onClose={closeModal} />}
+            {modalType === 'view' && selectedPO && <ViewPurchaseOrderModal order={selectedPO} onClose={closeModal} />}
             {modalType === 'edit' && selectedPO && <EditPurchaseOrderModal po={selectedPO} onSave={handleSave} onClose={closeModal} />}
+            {modalType === 'add' && <AddPurchaseOrderModal onAdd={handleAdd} onClose={closeModal} />}
         </>
     );
 };

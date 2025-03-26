@@ -8,8 +8,22 @@ import Pagination from '../../components/Pagination';
 
 const ClientTable = () => {
     const [clients, setClients] = useState([
-        { clientID: 'C001', name: 'ABC Pharmacy', licenseNo: 'FDA12345' },
-        { clientID: 'C002', name: 'XYZ Drugstore', licenseNo: 'FDA67890' },
+        {
+            clientID: 'C001',
+            name: 'ABC Pharmacy',
+            licenseNo: 'FDA12345',
+            contactPerson: 'Jane Dela Cruz',
+            contactNumber: '0917-123-4567',
+            email: 'abc@pharmacy.com',
+        },
+        {
+            clientID: 'C002',
+            name: 'XYZ Drugstore',
+            licenseNo: 'FDA67890',
+            contactPerson: 'Mark Santos',
+            contactNumber: '0918-456-7890',
+            email: 'xyz@drugstore.com',
+        },
     ]);
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -62,6 +76,13 @@ const ClientTable = () => {
         closeModal();
     };
 
+    const handleRemove = (clientID) => {
+        const confirmed = window.confirm("Are you sure you want to remove this client?");
+        if (confirmed) {
+            setClients(clients.filter(client => client.clientID !== clientID));
+        }
+    };
+
     const toggleSort = (column) => {
         if (sortColumn === column) {
             setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -75,7 +96,6 @@ const ClientTable = () => {
         <div className="p-4 bg-white rounded shadow">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Registered Clients</h2>
 
-            {/* Search Bar and Add Button - Same layout as OrderTable */}
             <div className="flex justify-between items-center mb-4">
                 <input
                     type="text"
@@ -93,17 +113,15 @@ const ClientTable = () => {
                 </button>
             </div>
 
-            {/* Table */}
-            <table className="w-full border-collapse border border-gray-300 text-gray-800">
+            <table className="w-full border-collapse border border-gray-300 text-gray-800 text-sm">
                 <thead className="bg-gray-200">
                     <tr>
-                        <th className="border p-2 text-left cursor-pointer" onClick={() => toggleSort('clientID')}>
-                            Client ID {sortColumn === 'clientID' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
-                        </th>
-                        <th className="border p-2 text-left cursor-pointer" onClick={() => toggleSort('name')}>
-                            Name {sortColumn === 'name' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
-                        </th>
-                        <th className="border p-2 text-left">License No.</th>
+                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('clientID')}>Client ID</th>
+                        <th className="border p-2 cursor-pointer" onClick={() => toggleSort('name')}>Company Name</th>
+                        <th className="border p-2">License No.</th>
+                        <th className="border p-2">Contact Person</th>
+                        <th className="border p-2">Contact No.</th>
+                        <th className="border p-2">Email</th>
                         <th className="border p-2 text-center">Actions</th>
                     </tr>
                 </thead>
@@ -113,18 +131,27 @@ const ClientTable = () => {
                             <td className="border p-2">{client.clientID}</td>
                             <td className="border p-2">{client.name}</td>
                             <td className="border p-2">{client.licenseNo}</td>
-                            <td className="border p-2 text-center space-x-2">
+                            <td className="border p-2">{client.contactPerson}</td>
+                            <td className="border p-2">{client.contactNumber}</td>
+                            <td className="border p-2">{client.email}</td>
+                            <td className="border p-2 text-center space-x-1">
                                 <button
-                                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                                    className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                                     onClick={() => openModal(client, 'view')}
                                 >
                                     View
                                 </button>
                                 <button
-                                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                                    className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
                                     onClick={() => openModal(client, 'edit')}
                                 >
                                     Edit
+                                </button>
+                                <button
+                                    className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                                    onClick={() => handleRemove(client.clientID)}
+                                >
+                                    Remove
                                 </button>
                             </td>
                         </tr>
