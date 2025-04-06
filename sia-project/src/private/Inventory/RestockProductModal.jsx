@@ -1,6 +1,7 @@
+// src/private/Inventory/RestockProductModal.jsx
 import React, { useState } from "react";
 
-const AddProductModal = ({ onClose, onSave }) => {
+const RestockProductModal = ({ onClose, onSave }) => {
   const [product, setProduct] = useState({
     genericName: "",
     brandName: "",
@@ -22,54 +23,57 @@ const AddProductModal = ({ onClose, onSave }) => {
       !product.unitOfMeasurement ||
       !product.packing ||
       !product.lotNum ||
-      product.stock <= 0 ||
-      !product.expiryDate
+      !product.expiryDate ||
+      product.stock <= 0
     )
       return;
 
-    onSave({ ...product, stock: Number(product.stock) });
+    onSave({
+      ...product,
+      stock: Number(product.stock),
+    });
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg text-gray-900">
-        <h2 className="text-xl font-bold text-center mb-4">Add New Product</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-gray-900 flex flex-col">
+        <h2 className="text-lg font-bold mb-4 text-center">Restock Product</h2>
 
-        <table className="w-full text-sm border border-gray-300 mb-4">
+        <table className="w-full border-collapse border border-gray-300 mb-4 flex-grow">
           <tbody>
             <tr>
-              <td className="border px-4 py-2 font-medium w-1/3">Generic Name</td>
-              <td className="border px-4 py-2">
+              <td className="border px-4 py-2">Generic Name</td>
+              <td>
                 <input
                   type="text"
                   name="genericName"
                   value={product.genericName}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full p-2 border bg-white text-gray-900"
                 />
               </td>
             </tr>
             <tr>
-              <td className="border px-4 py-2 font-medium">Brand Name</td>
-              <td className="border px-4 py-2">
+              <td className="border px-4 py-2">Brand Name</td>
+              <td>
                 <input
                   type="text"
                   name="brandName"
                   value={product.brandName}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full p-2 border bg-white text-gray-900"
                 />
               </td>
             </tr>
             <tr>
-              <td className="border px-4 py-2 font-medium">Unit</td>
-              <td className="border px-4 py-2">
+              <td className="border px-4 py-2">Unit</td>
+              <td>
                 <select
                   name="unitOfMeasurement"
                   value={product.unitOfMeasurement}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full p-2 border bg-white text-gray-900"
                 >
                   <option value="">Select Unit</option>
                   <option value="Tablet">Tablet</option>
@@ -83,65 +87,65 @@ const AddProductModal = ({ onClose, onSave }) => {
               </td>
             </tr>
             <tr>
-              <td className="border px-4 py-2 font-medium">Packing</td>
-              <td className="border px-4 py-2">
+              <td className="border px-4 py-2">Packing</td>
+              <td>
                 <input
                   type="text"
                   name="packing"
                   value={product.packing}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full p-2 border bg-white text-gray-900"
                 />
               </td>
             </tr>
             <tr>
-              <td className="border px-4 py-2 font-medium">Lot Number</td>
-              <td className="border px-4 py-2">
+              <td className="border px-4 py-2">Lot Number</td>
+              <td>
                 <input
                   type="text"
                   name="lotNum"
                   value={product.lotNum}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full p-2 border bg-white text-gray-900"
                 />
               </td>
             </tr>
             <tr>
-              <td className="border px-4 py-2 font-medium">Stock</td>
-              <td className="border px-4 py-2">
+              <td className="border px-4 py-2">Stock Quantity</td>
+              <td>
                 <input
                   type="number"
                   name="stock"
                   value={product.stock}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full p-2 border bg-white text-gray-900"
                 />
               </td>
             </tr>
             <tr>
-              <td className="border px-4 py-2 font-medium">Expiry Date</td>
-              <td className="border px-4 py-2">
+              <td className="border px-4 py-2">Expiry Date</td>
+              <td>
                 <input
                   type="date"
                   name="expiryDate"
                   value={product.expiryDate}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full p-2 border bg-white text-gray-900"
                 />
               </td>
             </tr>
           </tbody>
         </table>
 
-        <div className="flex justify-end space-x-2 mt-4">
+        <div className="flex justify-end mt-4 space-x-2">
           <button
-            className="bg-green-500 text-white px-5 py-2 rounded hover:bg-green-600"
+            className="bg-green-500 text-white px-6 py-2 rounded shadow"
             onClick={handleSave}
           >
             Save
           </button>
           <button
-            className="bg-red-500 text-white px-5 py-2 rounded hover:bg-red-600"
+            className="bg-red-500 text-white px-6 py-2 rounded shadow"
             onClick={onClose}
           >
             Cancel
@@ -152,4 +156,4 @@ const AddProductModal = ({ onClose, onSave }) => {
   );
 };
 
-export default AddProductModal;
+export default RestockProductModal;

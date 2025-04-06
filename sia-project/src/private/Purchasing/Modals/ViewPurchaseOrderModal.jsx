@@ -8,11 +8,11 @@ const ViewPurchaseOrderModal = ({ order, onClose }) => {
   );
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Purchase Order Details</h2>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white text-gray-900 p-6 rounded-lg shadow-lg w-full max-w-lg">
+        <h2 className="text-2xl font-bold mb-4">Purchase Order Details</h2>
 
-        <div className="mb-4 text-sm text-gray-700 space-y-1">
+        <div className="mb-4 text-sm space-y-1">
           <p><strong>PO Number:</strong> {order.poID}</p>
           <p><strong>Supplier:</strong> {order.supplier}</p>
           <p><strong>Order Date:</strong> {order.orderDate}</p>
@@ -20,39 +20,44 @@ const ViewPurchaseOrderModal = ({ order, onClose }) => {
         </div>
 
         <h3 className="text-lg font-semibold mb-2">Ordered Items</h3>
-        <table className="w-full border-collapse border border-gray-300 text-sm mb-2">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="border p-2">Item</th>
-              <th className="border p-2">Qty</th>
-              <th className="border p-2">Unit Price</th>
-              <th className="border p-2">Subtotal</th>
-            </tr>
-          </thead>
-          <tbody>
-            {order.items && order.items.length > 0 ? (
-              order.items.map((item, index) => (
-                <tr key={index}>
-                  <td className="border p-2">{item.name}</td>
-                  <td className="border p-2 text-center">{item.quantity}</td>
-                  <td className="border p-2 text-right">₱{item.unitPrice.toFixed(2)}</td>
-                  <td className="border p-2 text-right">₱{(item.quantity * item.unitPrice).toFixed(2)}</td>
-                </tr>
-              ))
-            ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse border border-gray-400 text-sm bg-white text-gray-900">
+            <thead className="bg-gray-100">
               <tr>
-                <td className="border p-2 text-center" colSpan="4">No items listed.</td>
+                <th className="border border-gray-300 p-2 text-left">Item</th>
+                <th className="border border-gray-300 p-2 text-center">Qty</th>
+                <th className="border border-gray-300 p-2 text-right">Unit Price</th>
+                <th className="border border-gray-300 p-2 text-right">Subtotal</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {order.items && order.items.length > 0 ? (
+                order.items.map((item, index) => (
+                  <tr key={index}>
+                    <td className="border border-gray-300 p-2">{item.name}</td>
+                    <td className="border border-gray-300 p-2 text-center">{item.quantity}</td>
+                    <td className="border border-gray-300 p-2 text-right">₱{item.unitPrice.toFixed(2)}</td>
+                    <td className="border border-gray-300 p-2 text-right">₱{(item.quantity * item.unitPrice).toFixed(2)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td className="border p-2 text-center" colSpan="4">No items listed.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-        <div className="text-right font-semibold text-gray-800">
+        <div className="text-right font-semibold mt-2">
           Total: ₱{totalAmount?.toFixed(2)}
         </div>
 
         <div className="flex justify-end mt-4">
-          <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" onClick={onClose}>
+          <button
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            onClick={onClose}
+          >
             Close
           </button>
         </div>
