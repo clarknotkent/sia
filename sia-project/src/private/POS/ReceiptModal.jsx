@@ -52,7 +52,8 @@ const ReceiptModal = ({ cartItems, onClose, onClear }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white w-full max-w-lg rounded-lg shadow-lg p-6 relative">
+      <div className="bg-white w-full max-w-lg rounded-lg shadow-lg p-6 relative text-black">
+
         <div ref={printRef}>
           <h2 className="text-xl font-bold text-center mb-1">Order Receipt</h2>
           <h4 className="text-center text-sm mb-4">Thank you for your purchase!</h4>

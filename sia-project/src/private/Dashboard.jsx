@@ -1,8 +1,8 @@
+//src/private/Dashboard.jsx
 import React from 'react';
 import Sidebar from './Sidebar';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
-import DashboardChart from './DashboardChart';
 import {
   ShoppingCart,
   Package,
@@ -11,6 +11,9 @@ import {
   ClipboardList,
   Warehouse,
 } from 'lucide-react';
+
+import DashboardMetrics from './DashboardMetrics'; // 💼 Summary tiles
+import RecentActivity from './RecentActivity';     // 🕓 Existing activity list
 
 const Navbar = ({ onLogout }) => (
   <div className="w-full bg-white shadow-md p-4 flex justify-between items-center pr-6">
@@ -50,29 +53,6 @@ const DashboardCard = ({ title, subtitle, status, statusColor, Icon, onClick }) 
   </div>
 );
 
-const RecentActivity = () => {
-  const mockActivity = [
-    { type: 'Order', detail: 'New client order received', time: '2 mins ago' },
-    { type: 'Delivery', detail: 'Delivery #1042 marked as delivered', time: '15 mins ago' },
-    { type: 'Stock-In', detail: 'Paracetamol restocked (Batch #2025)', time: '30 mins ago' },
-    { type: 'PO', detail: 'PO #0027 submitted to Supplier A', time: '1 hour ago' },
-  ];
-
-  return (
-    <div className="bg-white p-6 rounded shadow-md border border-gray-300 mt-6">
-      <h3 className="text-lg font-bold text-gray-800 mb-4">Recent Activity</h3>
-      <ul className="space-y-3 text-sm">
-        {mockActivity.map((item, idx) => (
-          <li key={idx} className="border-b pb-2">
-            <span className="font-medium text-blue-600">{item.type}</span>: {item.detail}
-            <span className="block text-xs text-gray-400">{item.time}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
 const MainContent = () => {
   const navigate = useNavigate();
 
@@ -80,11 +60,11 @@ const MainContent = () => {
     <div className="flex-1 bg-gray-100 p-6 overflow-auto">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Supply Chain Overview</h2>
 
-      {/* Bar Chart */}
-      <DashboardChart />
+      {/* Top Metrics Section */}
+      <DashboardMetrics />
 
-      {/* Module Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Module Status Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
         <DashboardCard
           title="POS Module"
           subtitle="₱12,500 sales today · 34 walk-in transactions"
