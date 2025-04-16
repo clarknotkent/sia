@@ -1,78 +1,40 @@
-Supply Chain Management System for Healthkey Pharma
-This repository is for the frontend. The dates below are my progress tracker. 
-Sidenote: Other versions and the backups are on my personal computer. Everything here is essentially the latest version.
+This branch is a front-end, back-end integration of the SIA Project.
 
-Instructions:
-Clone the repo
--Navigate to sia-project
--npm install
--npm run dev
+📦 **Branch:** `complete-system`
 
-Live site: https://clarknotkent.github.io/sia/
-username: admin
-password: admin123
+📅 **Project Log - 4/16/2025 (First Commit)**
 
-SIA Log 3/5/2025
+---
 
-Completed:
-Ordering Module
-Inventory Module
-Delivery Module.
+### ✅ Staff Management
+- CRUD operations with UI forms and modals
+- Employee ID auto-generation
+- Modal-based detail view (ViewStaffModal)
+- Connected to Express backend
 
-In progress:
-Purchasing Module
+---
 
-Not yet started:
-POS
+### ✅ Inventory Management
+- Product CRUD with image upload and resizing
+- Fields: generic name, brand name, unit, packing, lot number, expiry date, price, stock
+- Stock filters (in stock, low, critical, none)
+- Real-time UI updates with backend sync
+- Pricing is stored directly in inventory (not POS)
 
-Additional Notes:
-General layout fixes applied to 
-Ordering, Inventory and Delivery.
-Sidebar flushed to the side except for Purchasing Module
+---
 
-Button placement still needs work
+### ✅ Point of Sale (POS)
+- Product grid pulls from backend inventory
+- Products displayed with image, generic name, unit, and price
+- Cart with discount, quantity, and subtotal + tax logic
+- Checkout sends data to backend and deducts stock
+- Receipt modal with store branding, tax, total, print functionality
+- Handles duplicate product names (temporarily ungrouped)
 
-Will send to adviser for consultation.
+---
 
-SIA Log 3/6/2025
-
-Completed:
-Basic features of the following:
-Ordering Module
-Inventory Module
-Delivery Module
-Purchasing Module
-
-Not yet started:
-POS
-
-Additional Notes:
-Applied layout fixes to all subsystems.
-Button placement fixes were applied.
-
-Added Search, dropdown, and pagination to Inventory Module.
-Will add it to Delivery. 
-
-SIA Log 3/8/2025
-
-Completed the following:
-Ordering Module
-Inventory Module
-Delivery Module
-Purchasing Module
-
-Started with POS
-Only placeholder codes for now
-Will continue by Sunday
-
-Additional Notes:
-Applied layout fixes to all subsystems including button placements, colors and etc.
-Added Paginations, search and filter features among all subsystems that require it.
-
-SIA Log 3/24/2025
-Completed POS Module, including checkout and print functions.
-
-SIA Log 3/25/2025
-Frontend 95% complete.
-Fixes include - Dashboard overhaul.
-Will consult for any additional requirements.
+### ✅ UI/UX Integration
+- Sidebar navigation
+- Tailwind styling for modals, tables, and product cards
+- Clean split between inventory, POS, and staff management views
+- Applied consistent design across modules
