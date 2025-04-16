@@ -1,5 +1,3 @@
-// src/private/StaffManagement/AddModal.jsx
-
 import React from 'react';
 
 const AddModal = ({ showAddForm, newEmployee, handleChange, handleSubmit, handleCancel }) => {
@@ -21,17 +19,25 @@ const AddModal = ({ showAddForm, newEmployee, handleChange, handleSubmit, handle
               required
             />
           </div>
+
           <div className="mb-4">
             <label className="block mb-1 font-medium">Role</label>
-            <input
+            <select
               className="w-full border p-2 bg-white text-black"
-              type="text"
               name="role"
               value={newEmployee.role}
               onChange={handleChange}
               required
-            />
+            >
+              <option value="">Select a role</option>
+              <option value="Admin">Admin</option>
+              <option value="Manager">Manager</option>
+              <option value="Cashier">Cashier</option>
+              <option value="Staff">Staff</option>
+              <option value="Driver">Driver</option>
+            </select>
           </div>
+
           <div className="mb-4">
             <label className="block mb-1 font-medium">Email</label>
             <input
@@ -43,6 +49,7 @@ const AddModal = ({ showAddForm, newEmployee, handleChange, handleSubmit, handle
               required
             />
           </div>
+
           <div className="mb-4">
             <label className="block mb-1 font-medium">Contact Number</label>
             <input
@@ -54,6 +61,7 @@ const AddModal = ({ showAddForm, newEmployee, handleChange, handleSubmit, handle
               required
             />
           </div>
+
           <div className="flex justify-end">
             <button
               className="bg-green-500 text-white px-4 py-2 rounded mr-2 hover:bg-green-600"

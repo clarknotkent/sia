@@ -13,10 +13,9 @@ const ReceiptModal = ({ cartItems, onClose, onClear }) => {
   const tax = subtotal * 0.12;
   const total = subtotal + tax;
 
-  // Auto-generate order number and date
   useEffect(() => {
     const randomOrderNumber = Math.floor(1000 + Math.random() * 9000);
-    setOrderNumber(`ORD-${randomOrderNumber}`);
+    setOrderNumber(`ORD-${Date.now()}`);
     setOrderDate(new Date().toLocaleString());
   }, []);
 
@@ -29,11 +28,11 @@ const ReceiptModal = ({ cartItems, onClose, onClear }) => {
           <title>Receipt</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 20px; }
-            h2, h4 { text-align: center; margin: 0; }
+            h1, h2, h4 { text-align: center; margin: 0; }
             .meta { margin-top: 10px; font-size: 14px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #ddd; padding: 8px; font-size: 14px; }
-            th { background-color: #f0f0f0; text-align: left; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; border: 1px solid #000; }
+            th, td { border: 1px solid #000; padding: 8px; font-size: 14px; text-align: left; }
+            th { background-color: #f0f0f0; }
             tfoot td { font-weight: bold; }
           </style>
         </head>
@@ -46,8 +45,8 @@ const ReceiptModal = ({ cartItems, onClose, onClear }) => {
     printWindow.focus();
     printWindow.print();
     printWindow.close();
-    onClear(); // ✅ Clear cart after printing
-    onClose(); // Close modal
+    onClear();
+    onClose();
   };
 
   return (
@@ -55,10 +54,9 @@ const ReceiptModal = ({ cartItems, onClose, onClear }) => {
       <div className="bg-white w-full max-w-lg rounded-lg shadow-lg p-6 relative text-black">
 
         <div ref={printRef}>
+          <h1 className="text-2xl font-bold text-center mb-1">Health Key Pharma</h1>
           <h2 className="text-xl font-bold text-center mb-1">Order Receipt</h2>
-          <h4 className="text-center text-sm mb-4">Thank you for your purchase!</h4>
 
-          {/* Meta Info */}
           <div className="meta text-sm mb-2">
             <p><strong>Order No:</strong> {orderNumber}</p>
             <p><strong>Date:</strong> {orderDate}</p>
@@ -69,15 +67,19 @@ const ReceiptModal = ({ cartItems, onClose, onClear }) => {
             <thead>
               <tr>
                 <th>Item</th>
+                <th>Brand</th>
+                <th>Unit</th>
                 <th>Qty</th>
-                <th>Discount</th>
+                <th>Disc</th>
                 <th>Price</th>
               </tr>
             </thead>
             <tbody>
               {cartItems.map((item, index) => (
                 <tr key={index}>
-                  <td>{item.name}</td>
+                  <td>{item.genericName || item.name}</td>
+                  <td>{item.brandName || "-"}</td>
+                  <td>{item.category}</td>
                   <td>{item.quantity}</td>
                   <td>{item.discount}%</td>
                   <td>₱{(item.price * item.quantity * (1 - item.discount / 100)).toFixed(2)}</td>
@@ -86,22 +88,21 @@ const ReceiptModal = ({ cartItems, onClose, onClear }) => {
             </tbody>
             <tfoot>
               <tr>
-                <td colSpan="3">Subtotal</td>
+                <td colSpan="5">Subtotal</td>
                 <td>₱{subtotal.toFixed(2)}</td>
               </tr>
               <tr>
-                <td colSpan="3">Tax (12%)</td>
+                <td colSpan="5">Tax (12%)</td>
                 <td>₱{tax.toFixed(2)}</td>
               </tr>
               <tr>
-                <td colSpan="3">Total</td>
+                <td colSpan="5">Total</td>
                 <td>₱{total.toFixed(2)}</td>
               </tr>
             </tfoot>
           </table>
         </div>
 
-        {/* Payment Method Selection */}
         <div className="mt-4">
           <label className="block text-sm font-medium mb-1">Select Payment Method:</label>
           <select
@@ -115,7 +116,6 @@ const ReceiptModal = ({ cartItems, onClose, onClear }) => {
           </select>
         </div>
 
-        {/* Buttons */}
         <div className="mt-6 flex justify-end gap-3">
           <button
             onClick={onClose}

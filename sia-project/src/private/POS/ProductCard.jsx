@@ -1,6 +1,6 @@
-//src/private/POS/ProductCard.jsx
+// src/private/POS/ProductCard.jsx
 import React from "react";
-import reactLogo from "../../assets/react.svg"; // Fallback image
+import fallbackImage from "../../assets/react.svg";
 
 const ProductCard = ({ product, onSelect }) => {
   return (
@@ -9,13 +9,17 @@ const ProductCard = ({ product, onSelect }) => {
       onClick={() => onSelect(product)}
     >
       <img
-        src={product.image || reactLogo}
-        alt={product.name}
+        src={product.image || fallbackImage}
+        alt={product.genericName}
         className="w-full h-28 object-contain rounded mb-2"
       />
-      <h3 className="font-semibold text-gray-800 text-base">{product.name}</h3>
-      <p className="text-xs text-gray-500 mb-1">{product.category}</p>
-      <p className="font-bold text-green-600 text-sm">₱{product.price.toLocaleString()}</p>
+
+      <div className="space-y-1 text-sm text-gray-800">
+        <h3 className="font-semibold text-base">{product.genericName}</h3>
+        <p className="text-xs text-gray-500">{product.brandName}</p>
+        <p className="text-xs text-gray-500">{product.unitOfMeasurement}</p>
+        <p className="font-bold text-green-600 text-sm">₱{product.price?.toLocaleString() || "N/A"}</p>
+      </div>
     </div>
   );
 };

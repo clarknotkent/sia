@@ -1,7 +1,6 @@
-// src/private/POS/CartPanel.jsx
 import React from 'react';
 
-const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onHold, onProceed, onClear }) => {
+const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onProceed, onClear }) => {
   const subtotal = cartItems.reduce(
     (total, item) => total + item.price * item.quantity * (1 - item.discount / 100),
     0
@@ -27,6 +26,10 @@ const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onHold, onProceed, o
               </button>
 
               <div className="font-semibold">{item.name}</div>
+              <div className="text-sm text-gray-600">
+                {item.brandName} — {item.category}
+              </div>
+
               <div className="flex items-center space-x-2 mt-2">
                 <label className="text-sm">Qty</label>
                 <input
@@ -65,27 +68,19 @@ const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onHold, onProceed, o
         </div>
       </div>
 
-      <div className="mt-6 flex flex-col gap-2">
+      <div className="mt-6 flex gap-2">
         <button
-          className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded w-full"
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded w-full"
           onClick={onClear}
         >
           Clear Cart
         </button>
-        <div className="flex gap-2">
-          <button
-            className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded w-full"
-            onClick={onHold}
-          >
-            Hold Order
-          </button>
-          <button
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full"
-            onClick={onProceed}
-          >
-            Checkout
-          </button>
-        </div>
+        <button
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full"
+          onClick={onProceed}
+        >
+          Checkout
+        </button>
       </div>
     </div>
   );

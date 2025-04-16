@@ -1,5 +1,5 @@
-// src/private/Inventory/InventoryDashboard.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Sidebar from "../Sidebar";
 import ProductTable from "./ProductTable";
 import AddProductModal from "./AddProductModal";
@@ -9,41 +9,10 @@ import ViewProductModal from "./ViewProductModal";
 import Pagination from "../../components/Pagination";
 
 const InventoryDashboard = () => {
-  const [products, setProducts] = useState([
-    {
-      id: "Paracetamol-Biogesic-Tablet",
-      genericName: "Paracetamol",
-      brandName: "Biogesic",
-      unitOfMeasurement: "Tablet",
-      packing: "Blister Pack",
-      lotNum: "LOT-001",
-      expiryDate: "2025-12-31",
-      inventory: {
-        stockLevel: 50,
-        reservedStock: 0,
-        thresholdLevel: 5,
-        lastDateUpdated: "2024-04-01",
-      },
-    },
-    {
-      id: "Amoxicillin-Amoxil-Capsule",
-      genericName: "Amoxicillin",
-      brandName: "Amoxil",
-      unitOfMeasurement: "Capsule",
-      packing: "Bottle",
-      lotNum: "LOT-002",
-      expiryDate: "2026-03-15",
-      inventory: {
-        stockLevel: 25,
-        reservedStock: 0,
-        thresholdLevel: 5,
-        lastDateUpdated: "2024-04-02",
-      },
-    },
-  ]);
-
+  const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [unitFilter, setUnitFilter] = useState("");
+  const [stockLevelFilter, setStockLevelFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
 
@@ -53,11 +22,36 @@ const InventoryDashboard = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isRestockModalOpen, setIsRestockModalOpen] = useState(false);
 
-  const filteredProducts = products.filter(product =>
-    (product.genericName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.brandName.toLowerCase().includes(searchQuery.toLowerCase())) &&
-    (unitFilter ? product.unitOfMeasurement === unitFilter : true)
-  );
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get("/api/inventory");
+      setProducts(res.data);
+    } catch (err) {
+      console.error("Failed to fetch inventory:", err);
+    }
+  };
+
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch =
+      product.genericName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.brandName.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesUnit = unitFilter ? product.unitOfMeasurement === unitFilter : true;
+
+    const stock = product.inventory?.stockLevel ?? 0;
+    const matchesStockLevel =
+      stockLevelFilter === "in" ? stock > 25 :
+      stockLevelFilter === "low" ? stock > 10 && stock <= 25 :
+      stockLevelFilter === "critical" ? stock > 0 && stock <= 10 :
+      stockLevelFilter === "none" ? stock === 0 :
+      true;
+
+    return matchesSearch && matchesUnit && matchesStockLevel;
+  });
 
   const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * pageSize,
@@ -66,6 +60,18 @@ const InventoryDashboard = () => {
 
   const totalPages = Math.ceil(filteredProducts.length / pageSize);
 
+  const handleRemove = async (product) => {
+    const confirmDelete = window.confirm(`Are you sure you want to remove "${product.genericName}"?`);
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`/api/inventory/${product.id}`);
+      fetchProducts();
+    } catch (err) {
+      console.error("Failed to remove product:", err);
+    }
+  };
+
   return (
     <div className="flex h-screen w-screen">
       <Sidebar />
@@ -73,6 +79,8 @@ const InventoryDashboard = () => {
         <h1 className="text-3xl font-bold text-gray-800 mb-4">Inventory Management</h1>
 
         <div className="bg-white p-6 rounded-lg shadow-md border">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Products</h2>
+
           {/* Search & Filters */}
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-4">
@@ -94,6 +102,17 @@ const InventoryDashboard = () => {
                 <option value="Capsule">Capsule</option>
                 <option value="Syrup">Syrup</option>
                 <option value="Injection">Injection</option>
+              </select>
+              <select
+                value={stockLevelFilter}
+                onChange={(e) => setStockLevelFilter(e.target.value)}
+                className="border p-2 rounded bg-white text-gray-800"
+              >
+                <option value="">All Stocks</option>
+                <option value="in">In Stock</option>
+                <option value="low">Low Stock</option>
+                <option value="critical">Critical Stock</option>
+                <option value="none">No Stock</option>
               </select>
             </div>
             <div className="flex gap-2">
@@ -124,12 +143,7 @@ const InventoryDashboard = () => {
               setSelectedProduct(product);
               setIsEditModalOpen(true);
             }}
-            onRemove={(product) => {
-              const confirmDelete = window.confirm(`Are you sure you want to remove "${product.genericName}"?`);
-              if (confirmDelete) {
-                setProducts(products.filter((p) => p.id !== product.id));
-              }
-            }}
+            onRemove={handleRemove}
           />
 
           <Pagination
@@ -143,42 +157,15 @@ const InventoryDashboard = () => {
         {isAddModalOpen && (
           <AddProductModal
             onClose={() => setIsAddModalOpen(false)}
-            onSave={(newProduct) =>
-              setProducts([
-                ...products,
-                {
-                  id: `custom-${Date.now()}`,
-                  ...newProduct,
-                  inventory: {
-                    stockLevel: newProduct.stock,
-                    reservedStock: 0,
-                    thresholdLevel: 5,
-                    lastDateUpdated: new Date().toISOString().split("T")[0],
-                  },
-                },
-              ])
-            }
+            refreshInventory={fetchProducts}
           />
         )}
 
         {isRestockModalOpen && (
           <RestockProductModal
             onClose={() => setIsRestockModalOpen(false)}
-            onSave={(restockProduct) =>
-              setProducts([
-                ...products,
-                {
-                  id: `restock-${Date.now()}`,
-                  ...restockProduct,
-                  inventory: {
-                    stockLevel: restockProduct.stock,
-                    reservedStock: 0,
-                    thresholdLevel: 5,
-                    lastDateUpdated: new Date().toISOString().split("T")[0],
-                  },
-                },
-              ])
-            }
+            originalProduct={selectedProduct}
+            refreshInventory={fetchProducts}
           />
         )}
 
@@ -186,11 +173,7 @@ const InventoryDashboard = () => {
           <EditProductModal
             product={selectedProduct}
             onClose={() => setIsEditModalOpen(false)}
-            onSave={(updatedProduct) =>
-              setProducts(products.map((prod) =>
-                prod.id === updatedProduct.id ? updatedProduct : prod
-              ))
-            }
+            refreshInventory={fetchProducts}
           />
         )}
 

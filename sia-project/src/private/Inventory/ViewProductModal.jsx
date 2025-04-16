@@ -6,6 +6,18 @@ const ViewProductModal = ({ product, onClose }) => {
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md text-gray-900">
         <h2 className="text-2xl font-bold mb-4 text-center">Product Details</h2>
 
+        {/* Image Display */}
+        {product.image && (
+          <div className="flex justify-center mb-4">
+            <img
+              src={product.image}
+              alt={product.genericName}
+              className="w-48 h-48 object-cover rounded border"
+            />
+          </div>
+        )}
+
+        {/* Basic Info */}
         <div className="space-y-2 text-sm">
           <p><strong>Product ID:</strong> {product.id}</p>
           <p><strong>Generic Name:</strong> {product.genericName}</p>
@@ -14,10 +26,12 @@ const ViewProductModal = ({ product, onClose }) => {
           <p><strong>Packing:</strong> {product.packing}</p>
           <p><strong>Lot Number:</strong> {product.lotNum}</p>
           <p><strong>Expiry Date:</strong> {product.expiryDate}</p>
+          <p><strong>Price:</strong> {product.price ? `₱${Number(product.price).toFixed(2)}` : "—"}</p>
         </div>
 
         <hr className="my-4" />
 
+        {/* Inventory Info */}
         <div className="space-y-2 text-sm">
           <p><strong>Stock Level:</strong> {product.inventory?.stockLevel ?? 0}</p>
           <p><strong>Reserved Stock:</strong> {product.inventory?.reservedStock ?? 0}</p>

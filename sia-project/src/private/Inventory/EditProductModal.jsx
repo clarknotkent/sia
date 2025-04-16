@@ -1,27 +1,57 @@
-//src/private/Inventory/EditProductModal.jsx
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import axios from "axios";
 
-const EditProductModal = ({ product, onClose, onSave }) => {
-  const [editedProduct, setEditedProduct] = useState({ ...product });
+const EditProductModal = ({ product, onClose, refreshInventory }) => {
+  const [form, setForm] = useState({
+    genericName: product.genericName,
+    brandName: product.brandName,
+    unitOfMeasurement: product.unitOfMeasurement,
+    packing: product.packing,
+    lotNum: product.lotNum,
+    expiryDate: product.expiryDate,
+    stockLevel: product.inventory?.stockLevel || 0,
+    price: product.price || "",
+  });
+
+  const [imageFile, setImageFile] = useState(null);
+  const fileInputRef = useRef();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "stock") {
-      setEditedProduct({
-        ...editedProduct,
-        inventory: {
-          ...editedProduct.inventory,
-          stockLevel: value,
-        },
-      });
-    } else {
-      setEditedProduct({ ...editedProduct, [name]: value });
-    }
+    setForm({ ...form, [name]: value });
   };
 
-  const handleSave = () => {
-    onSave(editedProduct);
-    onClose();
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) setImageFile(file);
+  };
+
+  const handleSave = async () => {
+    if (!product?.id) {
+      console.error("Product ID is missing!");
+      alert("Cannot update: Product ID is missing.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("genericName", form.genericName);
+      formData.append("brandName", form.brandName);
+      formData.append("unitOfMeasurement", form.unitOfMeasurement);
+      formData.append("packing", form.packing);
+      formData.append("lotNum", form.lotNum);
+      formData.append("expiryDate", form.expiryDate);
+      formData.append("stockLevel", form.stockLevel);
+      formData.append("price", form.price);
+      formData.append("thresholdLevel", 5); // default
+      if (imageFile) formData.append("image", imageFile);
+
+      await axios.put(`/api/inventory/${product.id}`, formData);
+      refreshInventory();
+      onClose();
+    } catch (err) {
+      console.error("Failed to update product:", err);
+    }
   };
 
   return (
@@ -32,14 +62,14 @@ const EditProductModal = ({ product, onClose, onSave }) => {
         <table className="w-full text-sm border border-gray-300 mb-4">
           <tbody>
             <tr>
-              <td className="border px-4 py-2 font-medium w-1/3">Generic Name</td>
+              <td className="border px-4 py-2 font-medium">Generic Name</td>
               <td className="border px-4 py-2">
                 <input
                   type="text"
                   name="genericName"
-                  value={editedProduct.genericName}
+                  value={form.genericName}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full border px-2 py-1 bg-white text-gray-900"
                 />
               </td>
             </tr>
@@ -49,29 +79,22 @@ const EditProductModal = ({ product, onClose, onSave }) => {
                 <input
                   type="text"
                   name="brandName"
-                  value={editedProduct.brandName}
+                  value={form.brandName}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full border px-2 py-1 bg-white text-gray-900"
                 />
               </td>
             </tr>
             <tr>
               <td className="border px-4 py-2 font-medium">Unit</td>
               <td className="border px-4 py-2">
-                <select
+                <input
+                  type="text"
                   name="unitOfMeasurement"
-                  value={editedProduct.unitOfMeasurement}
+                  value={form.unitOfMeasurement}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
-                >
-                  <option value="Tablet">Tablet</option>
-                  <option value="Capsule">Capsule</option>
-                  <option value="Bottle">Bottle</option>
-                  <option value="Syringe">Syringe</option>
-                  <option value="Box">Box</option>
-                  <option value="Ampoule">Ampoule</option>
-                  <option value="Other">Other</option>
-                </select>
+                  className="w-full border px-2 py-1 bg-white text-gray-900"
+                />
               </td>
             </tr>
             <tr>
@@ -80,9 +103,9 @@ const EditProductModal = ({ product, onClose, onSave }) => {
                 <input
                   type="text"
                   name="packing"
-                  value={editedProduct.packing}
+                  value={form.packing}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full border px-2 py-1 bg-white text-gray-900"
                 />
               </td>
             </tr>
@@ -92,9 +115,9 @@ const EditProductModal = ({ product, onClose, onSave }) => {
                 <input
                   type="text"
                   name="lotNum"
-                  value={editedProduct.lotNum}
+                  value={form.lotNum}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full border px-2 py-1 bg-white text-gray-900"
                 />
               </td>
             </tr>
@@ -103,10 +126,10 @@ const EditProductModal = ({ product, onClose, onSave }) => {
               <td className="border px-4 py-2">
                 <input
                   type="number"
-                  name="stock"
-                  value={editedProduct.inventory?.stockLevel}
+                  name="stockLevel"
+                  value={form.stockLevel}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full border px-2 py-1 bg-white text-gray-900"
                 />
               </td>
             </tr>
@@ -116,9 +139,34 @@ const EditProductModal = ({ product, onClose, onSave }) => {
                 <input
                   type="date"
                   name="expiryDate"
-                  value={editedProduct.expiryDate}
+                  value={form.expiryDate}
                   onChange={handleChange}
-                  className="w-full border px-2 py-1 text-gray-900 bg-white"
+                  className="w-full border px-2 py-1 bg-white text-gray-900"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium">Price</td>
+              <td className="border px-4 py-2">
+                <input
+                  type="number"
+                  step="0.01"
+                  name="price"
+                  value={form.price}
+                  onChange={handleChange}
+                  className="w-full border px-2 py-1 bg-white text-gray-900"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium">Image</td>
+              <td className="border px-4 py-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  ref={fileInputRef}
+                  className="w-full"
                 />
               </td>
             </tr>
