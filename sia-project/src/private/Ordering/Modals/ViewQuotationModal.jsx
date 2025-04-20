@@ -1,69 +1,97 @@
 // src/private/Ordering/Modals/ViewQuotationModal.jsx
+import { useState } from 'react';
+import PropTypes from 'prop-types';
+import axios from 'axios';
 
-import React from 'react';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
-const ViewQuotationModal = ({ quotation, onClose }) => {
-    const { quotationID, quotationDate, status, totalAmount, client, items = [] } = quotation;
+const ViewQuotationModal = ({ quotation, onClose, fetchQuotations }) => {
+  const [isConverting, setIsConverting] = useState(false);
+  const { quotationID, quotationDate, status, client, items, totalAmount } = quotation;
+  const isApproved = status === 'Approved';
 
-    return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Quotation Details</h2>
+  const handleConvertToOrder = async () => {
+    if (!quotationID) {
+      alert("Invalid quotation selected.");
+      return;
+    }
 
-                {/* Quotation Info */}
-                <div className="space-y-2 text-gray-800 mb-4">
-                    <p><strong>Quotation ID:</strong> {quotationID}</p>
-                    <p><strong>Date:</strong> {quotationDate}</p>
-                    <p><strong>Status:</strong> {status}</p>
-                    <p><strong>Total:</strong> ₱{totalAmount?.toLocaleString()}</p>
-                </div>
+    setIsConverting(true);
+    try {
+      // Updated endpoint to match the backend route
+      await axios.post(`${API_BASE_URL}/orders/quotations/${quotationID}/convert`);
+      alert("Quotation converted to Order successfully!");
+      fetchQuotations?.(); // Refetch quotations if the function is provided
+      onClose();
+    } catch (error) {
+      console.error("Failed to convert quotation:", error.response?.data || error.message);
+      alert(error.response?.data?.error || "Failed to convert quotation. Please try again.");
+    } finally {
+      setIsConverting(false);
+    }
+  };
 
-                <hr className="my-4" />
+  const formatDateTime = (rawDate) => {
+    const d = new Date(rawDate);
+    if (isNaN(d)) return rawDate; // fallback if it's already preformatted
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${mm}-${dd}-${yyyy} | ${hh}:${min}`;
+  };
 
-                {/* Client Info */}
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Client Information</h3>
-                <div className="space-y-2 text-gray-800 mb-4">
-                    <p><strong>Company Name:</strong> {client?.name}</p>
-                    <p><strong>License No.:</strong> {client?.licenseNo}</p>
-                    <p><strong>Contact Person:</strong> {client?.contactPerson}</p>
-                    <p><strong>Contact Number:</strong> {client?.contactNumber}</p>
-                    <p><strong>Email:</strong> {client?.email}</p>
-                </div>
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Quotation Details</h2>
+        <p><strong>ID:</strong> {quotationID}</p>
+        <p><strong>Date:</strong> {quotationDate ? formatDateTime(quotationDate) : ''}</p>
+        <p><strong>Status:</strong> {status}</p>
 
-                {/* Quoted Items */}
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Quoted Items</h3>
-                <table className="w-full text-sm border border-gray-300 text-gray-800 mb-6">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="border p-2 text-left">Item</th>
-                            <th className="border p-2 text-right">Qty</th>
-                            <th className="border p-2 text-right">Unit Price</th>
-                            <th className="border p-2 text-right">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {items.map((item, index) => (
-                            <tr key={index} className="hover:bg-gray-50">
-                                <td className="border p-2">{item.name}</td>
-                                <td className="border p-2 text-right">{item.quantity}</td>
-                                <td className="border p-2 text-right">₱{item.unitPrice.toFixed(2)}</td>
-                                <td className="border p-2 text-right">₱{(item.quantity * item.unitPrice).toFixed(2)}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+        <h3 className="mt-4 text-lg font-semibold text-gray-700">Client</h3>
+        <p><strong>Name:</strong> {client?.name}</p>
+        <p><strong>Contact:</strong> {client?.contactPerson} | {client?.contactNumber}</p>
+        <p><strong>Email:</strong> {client?.email}</p>
 
-                <div className="flex justify-end">
-                    <button
-                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                        onClick={onClose}
-                    >
-                        Close
-                    </button>
-                </div>
-            </div>
+        <h3 className="mt-4 text-lg font-semibold text-gray-700">Items</h3>
+        <ul className="text-sm">
+          {items.map((item, idx) => (
+            <li key={idx} className="border-b py-1">
+              {item.name} — {item.quantity} x ₱{item.unitPrice}
+            </li>
+          ))}
+        </ul>
+
+        <p className="mt-4 font-bold text-right">Total: ₱{totalAmount?.toLocaleString()}</p>
+
+        <div className="flex justify-end mt-6 gap-2">
+          {isApproved && (
+            <button
+              className={`bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 ${isConverting ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={handleConvertToOrder}
+              disabled={isConverting}
+            >
+              {isConverting ? 'Converting...' : 'Convert to Order'}
+            </button>
+          )}
+          <button
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            onClick={onClose}
+          >
+            Close
+          </button>
         </div>
-    );
+      </div>
+    </div>
+  );
+};
+
+ViewQuotationModal.propTypes = {
+  quotation: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
+  fetchQuotations: PropTypes.func,
 };
 
 export default ViewQuotationModal;

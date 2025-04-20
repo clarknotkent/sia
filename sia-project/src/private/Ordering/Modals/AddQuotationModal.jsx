@@ -1,189 +1,306 @@
-import React, { useState } from 'react';
-
-const mockClients = [
-    {
-        clientID: 'C001',
-        name: 'ABC Pharmacy',
-        licenseNo: 'FDA12345',
-        contactPerson: 'Jane Dela Cruz',
-        contactNumber: '0917-123-4567',
-        email: 'abc@pharmacy.com'
-    },
-    {
-        clientID: 'C002',
-        name: 'XYZ Drugstore',
-        licenseNo: 'FDA67890',
-        contactPerson: 'Mark Santos',
-        contactNumber: '0918-456-7890',
-        email: 'xyz@drugstore.com'
-    }
-];
+// src/private/Ordering/Modals/AddQuotationModal.jsx
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import axios from 'axios';
 
 const AddQuotationModal = ({ onAdd, onClose }) => {
-    const [formData, setFormData] = useState({
-        quotationID: '',
-        quotationDate: '',
-        status: 'Pending',
-        client: null,
-        items: [{ name: '', quantity: 0, unitPrice: 0 }],
+  const [inventoryItems, setInventoryItems] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [formData, setFormData] = useState({
+    quotationID: '',
+    quotationDate: '',
+    status: 'Pending',
+    client: null,
+    items: [{ productId: '', quantity: 0 }],
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const API_BASE_URL = 'http://localhost:5000';
+        const [clientRes, inventoryRes] = await Promise.all([
+          axios.get(`${API_BASE_URL}/api/orders/clients`),
+          axios.get(`${API_BASE_URL}/api/inventory`),
+        ]);
+        setClients(clientRes.data);
+        setInventoryItems(inventoryRes.data);
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+        setError("Failed to load data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleClientSelect = (e) => {
+    const selected = clients.find((c) => c.clientID === e.target.value);
+    setFormData((prev) => ({ ...prev, client: selected }));
+  };
+
+  const handleItemChange = (index, field, value) => {
+    const updatedItems = [...formData.items];
+    updatedItems[index][field] = field === 'quantity' ? parseInt(value, 10) || 0 : value;
+    setFormData((prev) => ({ ...prev, items: updatedItems }));
+  };
+
+  const addItem = () => {
+    setFormData((prev) => ({
+      ...prev,
+      items: [...prev.items, { productId: '', quantity: 0 }],
+    }));
+  };
+
+  const removeItem = (index) => {
+    const updatedItems = [...formData.items];
+    updatedItems.splice(index, 1);
+    setFormData((prev) => ({ ...prev, items: updatedItems }));
+  };
+
+  const handleSubmit = () => {
+    if (!formData.quotationID || !formData.quotationDate || !formData.client) {
+      return alert("Please complete all required fields.");
+    }
+
+    const itemsDetailed = formData.items.map((item) => {
+      const product = inventoryItems.find((p) => p.id === item.productId);
+      if (!product) {
+        alert("One or more selected products are invalid.");
+        throw new Error("Invalid product selection.");
+      }
+      return {
+        name: product.genericName,
+        quantity: item.quantity,
+        unitPrice: product.price,
+      };
     });
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    const totalAmount = itemsDetailed.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
 
-    const handleClientSelect = (e) => {
-        const selectedID = e.target.value;
-        const selectedClient = mockClients.find(c => c.clientID === selectedID);
-        setFormData(prev => ({ ...prev, client: selectedClient }));
-    };
+    const dateObj = new Date();
+    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const dd = String(dateObj.getDate()).padStart(2, '0');
+    const yyyy = dateObj.getFullYear();
+    const hh = String(dateObj.getHours()).padStart(2, '0');
+    const min = String(dateObj.getMinutes()).padStart(2, '0');
+    const formattedDate = `${mm}-${dd}-${yyyy} | ${hh}:${min}`;
 
-    const handleItemChange = (index, field, value) => {
-        const updatedItems = [...formData.items];
-        updatedItems[index][field] = field === 'quantity' || field === 'unitPrice' ? parseFloat(value) : value;
-        setFormData(prev => ({ ...prev, items: updatedItems }));
-    };
+    onAdd({
+      ...formData,
+      quotationDate: formattedDate,
+      items: itemsDetailed,
+      totalAmount,
+    });
+    onClose();
+  };
 
-    const addItem = () => {
-        setFormData(prev => ({
-            ...prev,
-            items: [...prev.items, { name: '', quantity: 0, unitPrice: 0 }]
-        }));
-    };
-
-    const removeItem = (index) => {
-        const updatedItems = [...formData.items];
-        updatedItems.splice(index, 1);
-        setFormData(prev => ({ ...prev, items: updatedItems }));
-    };
-
-    const handleSubmit = () => {
-        const { quotationID, quotationDate, client, items } = formData;
-
-        if (!quotationID || !quotationDate || !client) {
-            alert("Please fill in all required fields.");
-            return;
-        }
-
-        const totalAmount = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-
-        const newQuotation = {
-            ...formData,
-            totalAmount,
-        };
-
-        onAdd(newQuotation);
-        onClose();
-    };
-
+  if (loading) {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded shadow-lg w-full max-w-2xl overflow-y-auto max-h-[90vh]">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Add New Quotation</h2>
-
-                {/* Quotation Info */}
-                <div className="space-y-2 mb-4">
-                    <input
-                        name="quotationID"
-                        placeholder="Quotation ID"
-                        value={formData.quotationID}
-                        onChange={handleChange}
-                        className="w-full p-2 border rounded bg-white text-gray-800"
-                    />
-                    <input
-                        type="date"
-                        name="quotationDate"
-                        value={formData.quotationDate}
-                        onChange={handleChange}
-                        className="w-full p-2 border rounded bg-white text-gray-800"
-                    />
-                    <select
-                        name="status"
-                        value={formData.status}
-                        onChange={handleChange}
-                        className="w-full p-2 border rounded bg-white text-gray-800"
-                    >
-                        <option value="Pending">Pending</option>
-                        <option value="Approved">Approved</option>
-                        <option value="Rejected">Rejected</option>
-                    </select>
-                </div>
-
-                {/* Client Selector */}
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Select Client</h3>
-                <select
-                    onChange={handleClientSelect}
-                    className="w-full mb-4 p-2 border rounded bg-white text-gray-800"
-                    value={formData.client?.clientID || ''}
-                >
-                    <option value="" disabled>Select a client</option>
-                    {mockClients.map(client => (
-                        <option key={client.clientID} value={client.clientID}>
-                            {client.name}
-                        </option>
-                    ))}
-                </select>
-
-                {/* Auto-filled client info */}
-                {formData.client && (
-                    <div className="grid grid-cols-1 gap-2 mb-4 text-gray-800 text-sm">
-                        <input readOnly value={formData.client.licenseNo} className="w-full p-2 border rounded bg-gray-100" placeholder="License No." />
-                        <input readOnly value={formData.client.contactPerson} className="w-full p-2 border rounded bg-gray-100" placeholder="Contact Person" />
-                        <input readOnly value={formData.client.contactNumber} className="w-full p-2 border rounded bg-gray-100" placeholder="Contact Number" />
-                        <input readOnly value={formData.client.email} className="w-full p-2 border rounded bg-gray-100" placeholder="Email" />
-                    </div>
-                )}
-
-                {/* Quoted Items */}
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Quoted Items</h3>
-                <div className="space-y-2 mb-4">
-                    {formData.items.map((item, index) => (
-                        <div key={index} className="grid grid-cols-4 gap-2 items-center">
-                            <input
-                                type="text"
-                                placeholder="Item Name"
-                                value={item.name}
-                                onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-                                className="p-2 border rounded bg-white text-gray-800"
-                            />
-                            <input
-                                type="number"
-                                placeholder="Qty"
-                                value={item.quantity}
-                                onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                                className="p-2 border rounded bg-white text-gray-800"
-                            />
-                            <input
-                                type="number"
-                                placeholder="Unit Price"
-                                value={item.unitPrice}
-                                onChange={(e) => handleItemChange(index, 'unitPrice', e.target.value)}
-                                className="p-2 border rounded bg-white text-gray-800"
-                            />
-                            <button
-                                className="bg-red-500 text-white px-2 py-1 rounded"
-                                onClick={() => removeItem(index)}
-                            >
-                                Remove
-                            </button>
-                        </div>
-                    ))}
-                    <button
-                        className="bg-blue-500 text-white px-4 py-1 rounded mt-2"
-                        onClick={addItem}
-                    >
-                        + Add Item
-                    </button>
-                </div>
-
-                {/* Actions */}
-                <div className="flex justify-end space-x-2">
-                    <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleSubmit}>Save</button>
-                    <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={onClose}>Cancel</button>
-                </div>
-            </div>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+          <p>Loading...</p>
         </div>
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+          <p className="text-red-500">{error}</p>
+          <button
+            className="bg-red-500 text-white px-4 py-2 rounded mt-4"
+            onClick={onClose}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl overflow-y-auto max-h-[90vh] text-gray-900">
+        <h2 className="text-xl font-bold text-center mb-4">Add New Quotation</h2>
+
+        <table className="w-full text-sm border border-gray-300 mb-4">
+          <tbody>
+            <tr>
+              <td className="border px-4 py-2 font-medium">Quotation ID</td>
+              <td className="border px-4 py-2">
+                <input
+                  type="text"
+                  name="quotationID"
+                  value={formData.quotationID}
+                  onChange={handleChange}
+                  className="w-full border px-2 py-1 bg-white"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium">Quotation Date</td>
+              <td className="border px-4 py-2">
+                <input
+                  type="date"
+                  name="quotationDate"
+                  value={formData.quotationDate}
+                  onChange={handleChange}
+                  className="w-full border px-2 py-1 bg-white"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium">Status</td>
+              <td className="border px-4 py-2">
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  className="w-full border px-2 py-1 bg-white"
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium">Client</td>
+              <td className="border px-4 py-2">
+                <select
+                  onChange={handleClientSelect}
+                  value={formData.client?.clientID || ''}
+                  className="w-full border px-2 py-1 bg-white"
+                >
+                  <option value="">Select Client</option>
+                  {clients.map((c) => (
+                    <option key={c.clientID} value={c.clientID}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </td>
+            </tr>
+            {formData.client && (
+              <>
+                <tr>
+                  <td className="border px-4 py-2">License No.</td>
+                  <td className="border px-4 py-2">{formData.client.licenseNo}</td>
+                </tr>
+                <tr>
+                  <td className="border px-4 py-2">Contact Person</td>
+                  <td className="border px-4 py-2">{formData.client.contactPerson}</td>
+                </tr>
+                <tr>
+                  <td className="border px-4 py-2">Contact Number</td>
+                  <td className="border px-4 py-2">{formData.client.contactNumber}</td>
+                </tr>
+                <tr>
+                  <td className="border px-4 py-2">Email</td>
+                  <td className="border px-4 py-2">{formData.client.email}</td>
+                </tr>
+              </>
+            )}
+          </tbody>
+        </table>
+
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">Quotation Items</h3>
+        <table className="w-full text-sm border border-gray-300 mb-4">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="border px-2 py-1 text-left">Product</th>
+              <th className="border px-2 py-1 text-right">Qty</th>
+              <th className="border px-2 py-1 text-right">Price</th>
+              <th className="border px-2 py-1 text-right">Stock</th>
+              <th className="border px-2 py-1 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {formData.items.map((item, index) => {
+              const selected = inventoryItems.find((p) => p.id === item.productId);
+              return (
+                <tr key={index}>
+                  <td className="border px-2 py-1">
+                    <select
+                      value={item.productId}
+                      onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
+                      className="w-full border px-1 py-1 bg-white"
+                    >
+                      <option value="">Select Product</option>
+                      {inventoryItems.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.genericName}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="border px-2 py-1 text-right">
+                    <input
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                      className="w-full border px-1 py-1 text-right bg-white"
+                    />
+                  </td>
+                  <td className="border px-2 py-1 text-right">
+                    {selected ? `₱${selected.price}` : ''}
+                  </td>
+                  <td className="border px-2 py-1 text-right">
+                    {selected?.inventory?.stockLevel || ''}
+                  </td>
+                  <td className="border px-2 py-1 text-center">
+                    <button
+                      onClick={() => removeItem(index)}
+                      className="bg-red-500 text-white px-2 py-1 rounded"
+                    >
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <button
+          className="bg-blue-500 text-white px-4 py-1 rounded mb-4"
+          onClick={addItem}
+        >
+          + Add Item
+        </button>
+
+        <div className="flex justify-end space-x-2">
+          <button
+            className="bg-green-500 text-white px-5 py-2 rounded hover:bg-green-600"
+            onClick={handleSubmit}
+          >
+            Save
+          </button>
+          <button
+            className="bg-red-500 text-white px-5 py-2 rounded hover:bg-red-600"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+AddQuotationModal.propTypes = {
+  onAdd: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default AddQuotationModal;

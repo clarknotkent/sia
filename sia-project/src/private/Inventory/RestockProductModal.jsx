@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
+import PropTypes from "prop-types";
 import axios from "axios";
 
 const RestockProductModal = ({ onClose, refreshInventory }) => {
@@ -198,6 +199,10 @@ const RestockProductModal = ({ onClose, refreshInventory }) => {
       </div>
     </div>
   );
+};
+RestockProductModal.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  refreshInventory: PropTypes.func.isRequired,
 };
 
 export default RestockProductModal;

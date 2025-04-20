@@ -1,5 +1,4 @@
-import React from 'react';
-
+//src/private/DashboardMetrics.jsx
 const metrics = [
   {
     label: 'Sales Today',

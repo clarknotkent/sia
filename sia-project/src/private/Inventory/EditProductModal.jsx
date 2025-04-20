@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
+import PropTypes from "prop-types";
 import axios from "axios";
 
 const EditProductModal = ({ product, onClose, refreshInventory }) => {
@@ -190,6 +191,23 @@ const EditProductModal = ({ product, onClose, refreshInventory }) => {
       </div>
     </div>
   );
+};
+EditProductModal.propTypes = {
+  product: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    genericName: PropTypes.string.isRequired,
+    brandName: PropTypes.string.isRequired,
+    unitOfMeasurement: PropTypes.string.isRequired,
+    packing: PropTypes.string.isRequired,
+    lotNum: PropTypes.string.isRequired,
+    expiryDate: PropTypes.string.isRequired,
+    inventory: PropTypes.shape({
+      stockLevel: PropTypes.number,
+    }),
+    price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  }).isRequired,
+  onClose: PropTypes.func.isRequired,
+  refreshInventory: PropTypes.func.isRequired,
 };
 
 export default EditProductModal;

@@ -1,9 +1,7 @@
-// controllers/posController.js
-const path = require('path');
-const fs = require('fs');
-
-let transactionHistory = []; // You can later persist this in a real DB
+//sia-backend/POS/posController.js
 const { productList } = require('../Inventory/inventoryController');
+
+let transactionHistory = []; // In‑memory for now; swap to a DB later
 
 // ✅ Handle POS Checkout
 const handleCheckout = (req, res) => {
@@ -17,52 +15,79 @@ const handleCheckout = (req, res) => {
 
   for (const item of cartItems) {
     const index = productList.findIndex(
-      (p) => p.genericName === item.genericName && p.brandName === item.brandName
+      (p) =>
+        p.genericName === item.genericName &&
+        p.brandName === item.brandName
     );
-
     if (index === -1) {
-      return res.status(404).json({ error: `Product not found: ${item.genericName}` });
+      return res
+        .status(404)
+        .json({ error: `Product not found: ${item.genericName}` });
     }
 
     const product = productList[index];
     const newStock = product.inventory.stockLevel - item.quantity;
-
     if (newStock < 0) {
-      return res.status(400).json({ error: `Insufficient stock for ${item.genericName}` });
+      return res
+        .status(400)
+        .json({ error: `Insufficient stock for ${item.genericName}` });
     }
 
+    // update stock
     productList[index].inventory.stockLevel = newStock;
-    productList[index].inventory.lastDateUpdated = new Date().toISOString().split("T")[0];
+    productList[index].inventory.lastDateUpdated = new Date()
+      .toISOString()
+      .split('T')[0];
 
     updatedProducts.push(productList[index]);
   }
 
-  // ✅ Generate transaction record
+  // build transaction record
+  const subtotal = cartItems.reduce(
+    (sum, i) => sum + i.price * i.quantity * (1 - i.discount / 100),
+    0
+  );
+  const taxRate = 0.12;
+  const totalAmount = subtotal * (1 + taxRate);
+
   const transaction = {
     orderId: `ORD-${Date.now()}`,
     date: new Date().toISOString(),
     items: cartItems,
     paymentMethod,
-    subtotal: cartItems.reduce(
-      (total, item) => total + item.price * item.quantity * (1 - item.discount / 100),
-      0
-    ),
-    tax: 0.12,
-    totalAmount: cartItems.reduce(
-      (total, item) => total + item.price * item.quantity * (1 - item.discount / 100),
-      0
-    ) * 1.12,
+    subtotal,
+    tax: taxRate,
+    totalAmount,
   };
 
   transactionHistory.push(transaction);
 
-  res.status(201).json({
+  return res.status(201).json({
     message: 'Checkout successful.',
     transaction,
     updatedProducts,
   });
 };
 
+const handleGetHistory = (_req, res) => {
+  res.json({ history: transactionHistory });
+};
+
+const handleDeleteTransaction = (req, res) => {
+  const { orderId } = req.params;
+  console.log("Received orderId for deletion:", orderId); // Debugging
+  const index = transactionHistory.findIndex((tx) => tx.orderId === orderId);
+
+  if (index === -1) {
+    return res.status(404).json({ error: "Transaction not found." });
+  }
+
+  transactionHistory.splice(index, 1);
+  res.status(200).json({ message: `Transaction ${orderId} deleted.` });
+};
+
 module.exports = {
   handleCheckout,
+  handleGetHistory,
+  handleDeleteTransaction,
 };

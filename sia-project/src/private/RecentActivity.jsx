@@ -1,6 +1,4 @@
 // src/private/RecentActivity.jsx
-import React from "react";
-
 const RecentActivity = () => {
   const mockActivity = [
     { type: "Order", detail: "New client order received", time: "2 mins ago" },

@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
+import PropTypes from "prop-types";
 
 const AddProductModal = ({ onClose, refreshInventory }) => {
   const [product, setProduct] = useState({
@@ -150,6 +151,10 @@ const AddProductModal = ({ onClose, refreshInventory }) => {
       </div>
     </div>
   );
+};
+AddProductModal.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  refreshInventory: PropTypes.func.isRequired,
 };
 
 export default AddProductModal;

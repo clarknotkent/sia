@@ -1,5 +1,4 @@
 //src/private/Dashboard.jsx
-import React from 'react';
 import Sidebar from './Sidebar';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
@@ -14,6 +13,8 @@ import {
 
 import DashboardMetrics from './DashboardMetrics'; // 💼 Summary tiles
 import RecentActivity from './RecentActivity';     // 🕓 Existing activity list
+
+import PropTypes from 'prop-types';
 
 const Navbar = ({ onLogout }) => (
   <div className="w-full bg-white shadow-md p-4 flex justify-between items-center pr-6">
@@ -38,6 +39,11 @@ const StatusChip = ({ label, color = 'green' }) => {
   return <span className={`${base} ${styles[color]}`}>{label}</span>;
 };
 
+StatusChip.propTypes = {
+  label: PropTypes.string.isRequired,
+  color: PropTypes.string,
+};
+
 const DashboardCard = ({ title, subtitle, status, statusColor, Icon, onClick }) => (
   <div
     className="bg-white p-6 rounded shadow-md border border-gray-300 cursor-pointer hover:shadow-lg hover:scale-[1.01] transition-all duration-200 flex gap-4 items-center min-h-[100px]"
@@ -52,6 +58,15 @@ const DashboardCard = ({ title, subtitle, status, statusColor, Icon, onClick }) 
     </div>
   </div>
 );
+
+DashboardCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  subtitle: PropTypes.string.isRequired,
+  status: PropTypes.string,
+  statusColor: PropTypes.string,
+  Icon: PropTypes.elementType.isRequired,
+  onClick: PropTypes.func,
+};
 
 const MainContent = () => {
   const navigate = useNavigate();
@@ -131,6 +146,14 @@ const Dashboard = ({ onLogout }) => {
       </div>
     </div>
   );
+};
+
+Navbar.propTypes = {
+  onLogout: PropTypes.func.isRequired,
+};
+
+Dashboard.propTypes = {
+  onLogout: PropTypes.func.isRequired,
 };
 
 export default Dashboard;

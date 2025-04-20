@@ -1,146 +1,174 @@
 // src/private/Ordering/Modals/EditOrderModal.jsx
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import axios from 'axios';
 
-import React, { useState } from 'react';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const EditOrderModal = ({ order, onSave, onClose }) => {
-    const [formData, setFormData] = useState({ ...order });
+  const [inventoryItems, setInventoryItems] = useState([]);
+  const [formData, setFormData] = useState({ ...order });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+  useEffect(() => {
+    axios.get(`${API_BASE_URL}/inventory`)
+      .then(res => setInventoryItems(res.data))
+      .catch(err => console.error("Failed to fetch inventory:", err));
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleItemChange = (index, field, value) => {
+    const updatedItems = [...formData.items];
+    updatedItems[index][field] = field === 'quantity' ? parseFloat(value) : value;
+    setFormData(prev => ({ ...prev, items: updatedItems }));
+  };
+
+  const addItem = (productId) => {
+    const selected = inventoryItems.find(p => p.id === productId);
+    if (!selected) return;
+    setFormData(prev => ({
+      ...prev,
+      items: [
+        ...prev.items,
+        { name: selected.genericName, quantity: 0, unitPrice: selected.price }
+      ]
+    }));
+  };
+
+  const removeItem = (index) => {
+    const updated = [...formData.items];
+    updated.splice(index, 1);
+    setFormData(prev => ({ ...prev, items: updated }));
+  };
+
+  const handleSubmit = async () => {
+    const payload = {
+      ...formData,
+      orderDate: order.orderDate // 🛠 Retain original timestamp!
     };
+    try {
+      await axios.put(`${API_BASE_URL}/orders/orders/${order.orderID}`, payload);
+      onSave(payload);
+      onClose();
+    } catch (err) {
+      console.error("Failed to save order:", err);
+      alert("Could not save order. " + (err.response?.data?.error || err.message));
+    }
+  };
 
-    const handleItemChange = (index, field, value) => {
-        const updatedItems = [...formData.items];
-        updatedItems[index][field] = field === 'quantity' || field === 'unitPrice' ? parseFloat(value) : value;
-        setFormData(prev => ({ ...prev, items: updatedItems }));
-    };
+  const selectedProductNames = formData.items.map(i => i.name);
 
-    const addItem = () => {
-        setFormData(prev => ({
-            ...prev,
-            items: [...prev.items, { name: '', quantity: 0, unitPrice: 0 }]
-        }));
-    };
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl overflow-y-auto max-h-[90vh] text-sm">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">Edit Order</h2>
 
-    const removeItem = (index) => {
-        const updated = [...formData.items];
-        updated.splice(index, 1);
-        setFormData({ ...formData, items: updated });
-    };
-
-    const handleSubmit = () => {
-        const totalAmount = formData.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-        onSave({ ...formData, totalAmount });
-        onClose();
-    };
-
-    const { client, orderDate, remainingBalance, status, employee, quotationID } = formData;
-
-    return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl overflow-y-auto max-h-[90vh]">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Edit Order</h2>
-
-                {/* Order Info */}
+        <table className="w-full border mb-4">
+          <tbody>
+            <tr>
+              <td className="border px-4 py-2 font-medium">Order Date</td>
+              <td className="border px-4 py-2">
                 <input
-                    type="date"
-                    name="orderDate"
-                    value={orderDate}
-                    onChange={handleChange}
-                    className="w-full mb-2 p-2 border rounded bg-white text-gray-800"
+                  type="text"
+                  value={new Date(order.orderDate).toLocaleString()}
+                  readOnly
+                  className="w-full p-2 border rounded bg-gray-100 text-gray-600"
                 />
-
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium">Remaining Balance</td>
+              <td className="border px-4 py-2">
                 <input
-                    type="number"
-                    name="remainingBalance"
-                    value={remainingBalance}
-                    onChange={handleChange}
-                    placeholder="Remaining Balance"
-                    className="w-full mb-2 p-2 border rounded bg-white text-gray-800"
+                  type="number"
+                  name="remainingBalance"
+                  value={formData.remainingBalance}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
                 />
-
-                <input
-                    name="employee"
-                    placeholder="Employee"
-                    value={employee}
-                    onChange={handleChange}
-                    className="w-full mb-2 p-2 border rounded bg-white text-gray-800"
-                />
-
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium">Status</td>
+              <td className="border px-4 py-2">
                 <select
-                    name="status"
-                    value={status}
-                    onChange={handleChange}
-                    className="w-full mb-4 p-2 border rounded bg-white text-gray-800"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded"
                 >
-                    <option value="Pending">Pending</option>
-                    <option value="Processing">Processing</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Refunded">Refunded</option>
-                    <option value="Cancelled">Cancelled</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Processing">Processing</option>
+                  <option value="For Delivery">For Delivery</option>
+                  <option value="Refunded">Refunded</option>
+                  <option value="Cancelled">Cancelled</option>
                 </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-                {/* Client Info (readonly) */}
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Client Info</h3>
-                <div className="grid grid-cols-1 gap-2 text-sm mb-4 text-gray-800">
-                    <input readOnly value={client?.name} className="w-full p-2 border rounded bg-gray-100" placeholder="Client Name" />
-                    <input readOnly value={client?.licenseNo} className="w-full p-2 border rounded bg-gray-100" placeholder="License No." />
-                    <input readOnly value={client?.contactPerson} className="w-full p-2 border rounded bg-gray-100" placeholder="Contact Person" />
-                    <input readOnly value={client?.contactNumber} className="w-full p-2 border rounded bg-gray-100" placeholder="Contact Number" />
-                    <input readOnly value={client?.email} className="w-full p-2 border rounded bg-gray-100" placeholder="Email" />
-                </div>
+        <h3 className="text-md font-semibold text-gray-700 mb-2">Client Information</h3>
+        <table className="w-full border text-sm mb-4">
+          <tbody>
+            <tr><td className="border px-4 py-2 font-medium">Name</td><td className="border px-4 py-2">{formData.client?.name}</td></tr>
+            <tr><td className="border px-4 py-2 font-medium">License No.</td><td className="border px-4 py-2">{formData.client?.licenseNo}</td></tr>
+            <tr><td className="border px-4 py-2 font-medium">Contact Person</td><td className="border px-4 py-2">{formData.client?.contactPerson}</td></tr>
+            <tr><td className="border px-4 py-2 font-medium">Contact Number</td><td className="border px-4 py-2">{formData.client?.contactNumber}</td></tr>
+            <tr><td className="border px-4 py-2 font-medium">Email</td><td className="border px-4 py-2">{formData.client?.email}</td></tr>
+          </tbody>
+        </table>
 
-                {/* Items Section */}
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Ordered Items</h3>
-                <div className="space-y-2 mb-4">
-                    {formData.items.map((item, index) => (
-                        <div key={index} className="grid grid-cols-4 gap-2 items-center">
-                            <input
-                                type="text"
-                                placeholder="Item Name"
-                                value={item.name}
-                                onChange={(e) => handleItemChange(index, 'name', e.target.value)}
-                                className="p-2 border rounded bg-white text-gray-800"
-                            />
-                            <input
-                                type="number"
-                                placeholder="Qty"
-                                value={item.quantity}
-                                onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                                className="p-2 border rounded bg-white text-gray-800"
-                            />
-                            <input
-                                type="number"
-                                placeholder="Unit Price"
-                                value={item.unitPrice}
-                                onChange={(e) => handleItemChange(index, 'unitPrice', e.target.value)}
-                                className="p-2 border rounded bg-white text-gray-800"
-                            />
-                            <button
-                                className="bg-red-500 text-white px-2 py-1 rounded"
-                                onClick={() => removeItem(index)}
-                            >
-                                Remove
-                            </button>
-                        </div>
-                    ))}
-                    <button
-                        className="bg-blue-500 text-white px-4 py-1 rounded mt-2"
-                        onClick={addItem}
-                    >
-                        + Add Item
-                    </button>
-                </div>
-
-                {/* Actions */}
-                <div className="flex justify-end space-x-2 mt-6">
-                    <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleSubmit}>Save</button>
-                    <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={onClose}>Cancel</button>
-                </div>
+        <h3 className="text-md font-semibold text-gray-700 mb-2">Order Items</h3>
+        <div className="space-y-2 mb-4">
+          {formData.items.map((item, idx) => (
+            <div key={idx} className="grid grid-cols-4 gap-2 items-center">
+              <input readOnly value={item.name} className="p-2 border rounded bg-gray-100" />
+              <input
+                type="number"
+                value={item.quantity}
+                onChange={(e) => handleItemChange(idx, 'quantity', e.target.value)}
+                className="p-2 border rounded"
+              />
+              <input readOnly value={`₱${item.unitPrice}`} className="p-2 border rounded bg-gray-100" />
+              <button onClick={() => removeItem(idx)} className="bg-red-500 text-white px-3 py-1 rounded">
+                Remove
+              </button>
             </div>
+          ))}
+          <select
+            className="p-2 border rounded w-full"
+            onChange={(e) => { if (e.target.value) addItem(e.target.value); e.target.value = ''; }}
+          >
+            <option value="">+ Add Product</option>
+            {inventoryItems
+              .filter(p => !selectedProductNames.includes(p.genericName))
+              .map(p => (
+                <option key={p.id} value={p.id}>{p.genericName}</option>
+              ))}
+          </select>
         </div>
-    );
+
+        <div className="flex justify-end gap-2">
+          <button onClick={handleSubmit} className="bg-green-500 text-white px-4 py-2 rounded">
+            Save
+          </button>
+          <button onClick={onClose} className="bg-red-500 text-white px-4 py-2 rounded">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+EditOrderModal.propTypes = {
+  order: PropTypes.object.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default EditOrderModal;

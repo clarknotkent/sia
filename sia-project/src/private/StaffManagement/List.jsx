@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 import ViewStaffModal from './ViewStaffModal';
 
 const List = ({ employees, confirmAction }) => {
@@ -75,6 +76,19 @@ const List = ({ employees, confirmAction }) => {
       )}
     </div>
   );
+};
+List.propTypes = {
+  employees: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      role: PropTypes.string.isRequired,
+      email: PropTypes.string.isRequired,
+      contact: PropTypes.string.isRequired,
+      status: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  confirmAction: PropTypes.func.isRequired,
 };
 
 export default List;

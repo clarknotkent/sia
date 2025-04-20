@@ -1,4 +1,5 @@
-import React from 'react';
+
+import PropTypes from 'prop-types';
 
 const AddModal = ({ showAddForm, newEmployee, handleChange, handleSubmit, handleCancel }) => {
   if (!showAddForm) return null;
@@ -81,6 +82,19 @@ const AddModal = ({ showAddForm, newEmployee, handleChange, handleSubmit, handle
       </div>
     </div>
   );
+};
+
+AddModal.propTypes = {
+  showAddForm: PropTypes.bool.isRequired,
+  newEmployee: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    role: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    contact: PropTypes.string.isRequired,
+  }).isRequired,
+  handleChange: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  handleCancel: PropTypes.func.isRequired,
 };
 
 export default AddModal;

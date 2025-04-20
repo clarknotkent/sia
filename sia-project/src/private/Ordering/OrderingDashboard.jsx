@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+//src/private/Ordering/OrderingDashboard.jsx
+import { useState } from "react";
 import Sidebar from "../Sidebar";
 import ClientTable from "./ClientTable";
 import QuotationTable from "./QuotationTable";

@@ -1,8 +1,15 @@
-import React from 'react';
+// src/private/POS/CartPanel.jsx
 
-const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onProceed, onClear }) => {
+const CartPanel = ({
+  cartItems,
+  onUpdateItem,
+  onRemoveItem,
+  onProceed,
+  onClear,
+}) => {
   const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity * (1 - item.discount / 100),
+    (sum, item) =>
+      sum + item.price * item.quantity * (1 - item.discount / 100),
     0
   );
   const tax = subtotal * 0.12;
@@ -25,9 +32,9 @@ const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onProceed, onClear }
                 ×
               </button>
 
-              <div className="font-semibold">{item.name}</div>
+              <div className="font-semibold">{item.genericName}</div>
               <div className="text-sm text-gray-600">
-                {item.brandName} — {item.category}
+                {item.brandName} — {item.unitOfMeasurement}
               </div>
 
               <div className="flex items-center space-x-2 mt-2">
@@ -37,7 +44,9 @@ const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onProceed, onClear }
                   className="border rounded w-16 p-1 text-center bg-white text-black"
                   value={item.quantity}
                   min={1}
-                  onChange={(e) => onUpdateItem(index, 'quantity', parseInt(e.target.value))}
+                  onChange={(e) =>
+                    onUpdateItem(index, "quantity", parseInt(e.target.value))
+                  }
                 />
                 <label className="text-sm ml-2">Discount %</label>
                 <input
@@ -45,7 +54,9 @@ const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onProceed, onClear }
                   className="border rounded w-16 p-1 text-center bg-white text-black"
                   value={item.discount}
                   min={0}
-                  onChange={(e) => onUpdateItem(index, 'discount', parseFloat(e.target.value))}
+                  onChange={(e) =>
+                    onUpdateItem(index, "discount", parseFloat(e.target.value))
+                  }
                 />
               </div>
             </div>
@@ -84,6 +95,25 @@ const CartPanel = ({ cartItems, onUpdateItem, onRemoveItem, onProceed, onClear }
       </div>
     </div>
   );
+};
+
+import PropTypes from 'prop-types';
+
+CartPanel.propTypes = {
+  cartItems: PropTypes.arrayOf(
+    PropTypes.shape({
+      genericName: PropTypes.string.isRequired,
+      brandName: PropTypes.string.isRequired,
+      unitOfMeasurement: PropTypes.string.isRequired,
+      price: PropTypes.number.isRequired,
+      quantity: PropTypes.number.isRequired,
+      discount: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+  onUpdateItem: PropTypes.func.isRequired,
+  onRemoveItem: PropTypes.func.isRequired,
+  onProceed: PropTypes.func.isRequired,
+  onClear: PropTypes.func.isRequired,
 };
 
 export default CartPanel;

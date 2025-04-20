@@ -1,5 +1,6 @@
 // src/private/StaffManagement/ViewStaffModal.jsx
-import React from 'react';
+
+import PropTypes from 'prop-types';
 
 const ViewStaffModal = ({ staff, onClose }) => {
   if (!staff) return null;
@@ -27,6 +28,16 @@ const ViewStaffModal = ({ staff, onClose }) => {
       </div>
     </div>
   );
+};
+
+ViewStaffModal.propTypes = {
+  staff: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    name: PropTypes.string.isRequired,
+    role: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+  }).isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default ViewStaffModal;

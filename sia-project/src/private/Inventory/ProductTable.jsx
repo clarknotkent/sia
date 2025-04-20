@@ -1,4 +1,5 @@
-import React from "react";
+
+import PropTypes from "prop-types";
 
 const ProductTable = ({ products = [], searchQuery = "", onView, onEdit, onRemove }) => {
   const filteredProducts = Array.isArray(products)
@@ -101,6 +102,26 @@ const ProductTable = ({ products = [], searchQuery = "", onView, onEdit, onRemov
       </table>
     </div>
   );
+};
+
+ProductTable.propTypes = {
+  products: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      genericName: PropTypes.string,
+      brandName: PropTypes.string,
+      unitOfMeasurement: PropTypes.string,
+      price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      expiryDate: PropTypes.string,
+      inventory: PropTypes.shape({
+        stockLevel: PropTypes.number,
+      }),
+    })
+  ),
+  searchQuery: PropTypes.string,
+  onView: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
 };
 
 export default ProductTable;

@@ -1,4 +1,6 @@
-import React from "react";
+// src/private/Inventory/ViewProductModal.jsx
+import fallbackImage from "../../assets/react.svg";
+import PropTypes from "prop-types";
 
 const ViewProductModal = ({ product, onClose }) => {
   return (
@@ -13,6 +15,10 @@ const ViewProductModal = ({ product, onClose }) => {
               src={product.image}
               alt={product.genericName}
               className="w-48 h-48 object-cover rounded border"
+              onError={(e) => {
+                e.currentTarget.onerror = null; // prevent loop
+                e.currentTarget.src = fallbackImage;
+              }}
             />
           </div>
         )}
@@ -34,8 +40,7 @@ const ViewProductModal = ({ product, onClose }) => {
         {/* Inventory Info */}
         <div className="space-y-2 text-sm">
           <p><strong>Stock Level:</strong> {product.inventory?.stockLevel ?? 0}</p>
-          <p><strong>Reserved Stock:</strong> {product.inventory?.reservedStock ?? 0}</p>
-          <p><strong>Threshold Level:</strong> {product.inventory?.thresholdLevel ?? 0}</p>
+          <p><strong>Reserved Stock:</strong>{" "}{Math.max(0, product.inventory?.reservedStock ?? 0)}</p>
           <p><strong>Last Updated:</strong> {product.inventory?.lastDateUpdated}</p>
         </div>
 
@@ -50,6 +55,26 @@ const ViewProductModal = ({ product, onClose }) => {
       </div>
     </div>
   );
+};
+ViewProductModal.propTypes = {
+  product: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    genericName: PropTypes.string,
+    brandName: PropTypes.string,
+    unitOfMeasurement: PropTypes.string,
+    packing: PropTypes.string,
+    lotNum: PropTypes.string,
+    expiryDate: PropTypes.string,
+    price: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    inventory: PropTypes.shape({
+      stockLevel: PropTypes.number,
+      reservedStock: PropTypes.number,
+      thresholdLevel: PropTypes.number,
+      lastDateUpdated: PropTypes.string,
+    }),
+    image: PropTypes.string,
+  }).isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default ViewProductModal;

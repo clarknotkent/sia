@@ -14,6 +14,14 @@ let staffList = [
     email: "maria@example.com",
     contact: "09987654321",
     status: "Suspended"
+  },
+  {
+    id: 3,
+    name: "Juan Santos",
+    role: "Delivery",
+    email: "Juan@example.com",
+    contact: "09123456789",
+    status: "Suspended"
   }
 ];
 

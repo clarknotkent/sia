@@ -1,6 +1,5 @@
 // src/private/StaffManagement/ConfirmModal.jsx
 
-import React from 'react';
 
 const ConfirmModal = ({ confirmModal, handleConfirm, handleCancelConfirm }) => {
   if (!confirmModal.show) return null;
@@ -43,6 +42,21 @@ const ConfirmModal = ({ confirmModal, handleConfirm, handleCancelConfirm }) => {
       </div>
     </div>
   );
+};
+
+import PropTypes from 'prop-types';
+
+ConfirmModal.propTypes = {
+  confirmModal: PropTypes.shape({
+    show: PropTypes.bool.isRequired,
+    action: PropTypes.string.isRequired,
+    employee: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      status: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+  handleConfirm: PropTypes.func.isRequired,
+  handleCancelConfirm: PropTypes.func.isRequired,
 };
 
 export default ConfirmModal;

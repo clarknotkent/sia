@@ -1,5 +1,4 @@
 //src/private/DashboardChart.jsx
-import React from 'react';
 import {
   BarChart,
   Bar,
