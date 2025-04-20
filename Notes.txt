@@ -1,40 +1,11 @@
-This branch is a front-end, back-end integration of the SIA Project.
+This branch is a front-end to back-end integration of the SIA Project Prototype Version 1.
 
-📦 **Branch:** `complete-system`
+📦 **Branch:** `complete-system-v1-prototype`
 
-📅 **Project Log - 4/16/2025 (First Commit)**
+📅 **Project Log - 4/21/2025 (First Commit)**
 
----
+Completed the following modules (Staff Management, POS, Inventory, Ordering and Delivery)
 
-### ✅ Staff Management
-- CRUD operations with UI forms and modals
-- Employee ID auto-generation
-- Modal-based detail view (ViewStaffModal)
-- Connected to Express backend
+delivery needs refinement
 
----
-
-### ✅ Inventory Management
-- Product CRUD with image upload and resizing
-- Fields: generic name, brand name, unit, packing, lot number, expiry date, price, stock
-- Stock filters (in stock, low, critical, none)
-- Real-time UI updates with backend sync
-- Pricing is stored directly in inventory (not POS)
-
----
-
-### ✅ Point of Sale (POS)
-- Product grid pulls from backend inventory
-- Products displayed with image, generic name, unit, and price
-- Cart with discount, quantity, and subtotal + tax logic
-- Checkout sends data to backend and deducts stock
-- Receipt modal with store branding, tax, total, print functionality
-- Handles duplicate product names (temporarily ungrouped)
-
----
-
-### ✅ UI/UX Integration
-- Sidebar navigation
-- Tailwind styling for modals, tables, and product cards
-- Clean split between inventory, POS, and staff management views
-- Applied consistent design across modules
+have not started with the Purchasing
