@@ -121,16 +121,16 @@ const ClientTable = () => {
         </button>
       </div>
 
-      <table className="w-full border-collapse border border-gray-300 text-gray-800 text-sm">
+      <table className="w-full border-collapse border border-gray-300 text-gray-800 text-sm text-center">
         <thead className="bg-gray-200">
-          <tr>
-            <th className="border p-2 cursor-pointer" onClick={() => toggleSort('clientID')}>Client ID</th>
-            <th className="border p-2 cursor-pointer" onClick={() => toggleSort('name')}>Company Name</th>
-            <th className="border p-2 cursor-pointer" onClick={() => toggleSort('licenseNo')}>License No.</th>
-            <th className="border p-2 cursor-pointer" onClick={() => toggleSort('address')}>Address</th>
-            <th className="border p-2 cursor-pointer" onClick={() => toggleSort('contactPerson')}>Contact Person</th>
-            <th className="border p-2 cursor-pointer" onClick={() => toggleSort('contactNumber')}>Contact No.</th>
-            <th className="border p-2 cursor-pointer" onClick={() => toggleSort('email')}>Email</th>
+          <tr className="text-center">
+            <th className="border p-2 cursor-pointer text-center" onClick={() => toggleSort('clientID')}>Client ID</th>
+            <th className="border p-2 cursor-pointer text-center" onClick={() => toggleSort('name')}>Company Name</th>
+            <th className="border p-2 cursor-pointer text-center" onClick={() => toggleSort('licenseNo')}>License No.</th>
+            <th className="border p-2 cursor-pointer text-center" onClick={() => toggleSort('address')}>Address</th>
+            <th className="border p-2 cursor-pointer text-center" onClick={() => toggleSort('contactPerson')}>Contact Person</th>
+            <th className="border p-2 cursor-pointer text-center" onClick={() => toggleSort('contactNumber')}>Contact No.</th>
+            <th className="border p-2 cursor-pointer text-center" onClick={() => toggleSort('email')}>Email</th>
             <th className="border p-2 text-center">Actions</th>
           </tr>
         </thead>
@@ -141,14 +141,14 @@ const ClientTable = () => {
             </tr>
           ) : (
             paginatedClients.map((client, index) => (
-              <tr key={`${client.clientID}-${index}`} className="hover:bg-gray-50">
-                <td className="border p-2">{client.clientID}</td>
-                <td className="border p-2">{client.name}</td>
-                <td className="border p-2">{client.licenseNo}</td>
-                <td className="border p-2">{client.address || '—'}</td>
-                <td className="border p-2">{client.contactPerson}</td>
-                <td className="border p-2">{client.contactNumber}</td>
-                <td className="border p-2">{client.email}</td>
+              <tr key={`${client.clientID}-${index}`} className="hover:bg-gray-50 text-center">
+                <td className="border p-2 text-center">{client.clientID}</td>
+                <td className="border p-2 text-center">{client.name}</td>
+                <td className="border p-2 text-center">{client.licenseNo}</td>
+                <td className="border p-2 text-center">{client.address || '—'}</td>
+                <td className="border p-2 text-center">{client.contactPerson}</td>
+                <td className="border p-2 text-center">{client.contactNumber}</td>
+                <td className="border p-2 text-center">{client.email}</td>
                 <td className="border p-2 text-center space-x-1">
                   <button
                     className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"

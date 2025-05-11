@@ -34,6 +34,19 @@ const AddQuotationModal = ({ onAdd, onClose }) => {
         setLoading(false);
       }
     };
+
+    // Generate a unique Quotation ID
+    const generateQuotationID = () => {
+      const randomID = Math.floor(1000 + Math.random() * 9000); // Generate a 4-digit random number
+      return `Q-${randomID}`;
+    };
+
+    // Set the generated Quotation ID when the modal is opened
+    setFormData((prev) => ({
+      ...prev,
+      quotationID: generateQuotationID(),
+    }));
+
     fetchData();
   }, []);
 
@@ -67,7 +80,7 @@ const AddQuotationModal = ({ onAdd, onClose }) => {
   };
 
   const handleSubmit = () => {
-    if (!formData.quotationID || !formData.quotationDate || !formData.client) {
+    if (!formData.quotationDate || !formData.client) {
       return alert("Please complete all required fields.");
     }
 
@@ -143,8 +156,8 @@ const AddQuotationModal = ({ onAdd, onClose }) => {
                   type="text"
                   name="quotationID"
                   value={formData.quotationID}
-                  onChange={handleChange}
-                  className="w-full border px-2 py-1 bg-white"
+                  readOnly
+                  className="w-full border px-2 py-1 bg-gray-100 text-gray-800"
                 />
               </td>
             </tr>

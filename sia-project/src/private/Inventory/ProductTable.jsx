@@ -1,4 +1,3 @@
-
 import PropTypes from "prop-types";
 
 const ProductTable = ({ products = [], searchQuery = "", onView, onEdit, onRemove }) => {
@@ -10,11 +9,11 @@ const ProductTable = ({ products = [], searchQuery = "", onView, onEdit, onRemov
 
   return (
     <div className="w-full">
-      <table className="w-full border-collapse border border-gray-300">
+      <table className="w-full border-collapse border border-gray-300 text-center">
         <thead className="bg-gray-200 text-gray-800 font-semibold">
-          <tr>
-            <th className="border px-4 py-2 text-left">Product ID</th>
-            <th className="border px-4 py-2 text-left">Generic Name</th>
+          <tr className="text-center">
+            <th className="border px-4 py-2 text-center">Product ID</th>
+            <th className="border px-4 py-2 text-center">Generic Name</th>
             <th className="border px-4 py-2 text-center">Brand Name</th>
             <th className="border px-4 py-2 text-center">Unit</th>
             <th className="border px-4 py-2 text-center">Price</th>
@@ -35,16 +34,15 @@ const ProductTable = ({ products = [], searchQuery = "", onView, onEdit, onRemov
                     index % 2 === 0 ? "bg-gray-50" : "bg-white"
                   }`}
                 >
-                  <td className="border px-4 py-2 text-left">{prod.id}</td>
-                  <td className="border px-4 py-2 text-left">{prod.genericName}</td>
-                  <td className="border px-4 py-2">{prod.brandName}</td>
-                  <td className="border px-4 py-2">{prod.unitOfMeasurement}</td>
-                  <td className="border px-4 py-2">
+                  <td className="border px-4 py-2 text-center">{prod.id}</td>
+                  <td className="border px-4 py-2 text-center">{prod.genericName}</td>
+                  <td className="border px-4 py-2 text-center">{prod.brandName}</td>
+                  <td className="border px-4 py-2 text-center">{prod.unitOfMeasurement}</td>
+                  <td className="border px-4 py-2 text-center">
                     {prod.price ? `₱${Number(prod.price).toFixed(2)}` : "—"}
                   </td>
-
                   <td
-                    className={`border px-4 py-2 font-semibold ${
+                    className={`border px-4 py-2 font-semibold text-center ${
                       stock === 0
                         ? "text-gray-500 italic"
                         : stock <= 10
@@ -66,9 +64,8 @@ const ProductTable = ({ products = [], searchQuery = "", onView, onEdit, onRemov
                       </>
                     )}
                   </td>
-
-                  <td className="border px-4 py-2">{prod.expiryDate || "—"}</td>
-                  <td className="border px-4 py-2 space-x-1">
+                  <td className="border px-4 py-2 text-center">{prod.expiryDate || "—"}</td>
+                  <td className="border px-4 py-2 text-center space-x-1">
                     <button
                       className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                       onClick={() => onView(prod)}

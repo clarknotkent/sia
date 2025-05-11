@@ -16,7 +16,7 @@ const EditQuotationModal = ({ quotation, onSave, onClose }) => {
   const [inventoryItems, setInventoryItems] = useState([]);
   const [formData, setFormData] = useState({
     ...quotation,
-    quotationDate: formatDate(quotation.quotationDate),
+    quotationDate: quotation.quotationDate, // use the original ISO string
   });
 
   useEffect(() => {
@@ -59,15 +59,20 @@ const EditQuotationModal = ({ quotation, onSave, onClose }) => {
   };
 
   const handleSubmit = () => {
-    const totalAmount = formData.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+    const updatedQuotationData = { ...formData };
+    if (updatedQuotationData.quotationDate) {
+      // If it's not already an ISO string, convert it
+      const d = new Date(updatedQuotationData.quotationDate);
+      updatedQuotationData.quotationDate = isNaN(d) ? new Date().toISOString() : d.toISOString();
+    }
+
+    const totalAmount = updatedQuotationData.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
     onSave({
-      ...formData,
-      quotationDate: quotation.quotationDate, // 🛡️ re-assign original date
+      ...updatedQuotationData,
       totalAmount
     });
     onClose();
   };
-  
 
   const selectedProductNames = formData.items.map(i => i.name);
 
@@ -79,26 +84,30 @@ const EditQuotationModal = ({ quotation, onSave, onClose }) => {
         <table className="w-full border mb-4">
           <tbody>
           <tr>
-            <td className="border px-4 py-2 font-medium">Quotation Date</td>
+            <td className="border px-4 py-2 font-medium text-black">Quotation Date</td>
             <td className="border px-4 py-2">
               <input
-                type="date"
+                type="text"
                 name="quotationDate"
-                value={formData.quotationDate}
-                disabled
-                className="w-full p-2 border rounded bg-gray-100 text-gray-600 cursor-not-allowed"
-                />
-              </td>
-            </tr>
+                value={
+                  formData.quotationDate && !isNaN(Date.parse(formData.quotationDate))
+                    ? new Date(formData.quotationDate).toLocaleString()
+                    : ''
+                }
+                readOnly
+                className="w-full p-2 border rounded bg-white text-black cursor-not-allowed"
+              />
+            </td>
+          </tr>
 
             <tr>
-              <td className="border px-4 py-2 font-medium">Status</td>
+              <td className="border px-4 py-2 font-medium text-black">Status</td>
               <td className="border px-4 py-2">
                 <select
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-white text-black"
                 >
                   <option value="Pending">Pending</option>
                   <option value="Approved">Approved</option>
@@ -109,35 +118,44 @@ const EditQuotationModal = ({ quotation, onSave, onClose }) => {
           </tbody>
         </table>
 
-        <h3 className="text-md font-semibold text-gray-700 mb-2">Client Information</h3>
-        <table className="w-full border text-sm mb-4">
+        <h3 className="text-md font-semibold text-gray-800 mb-2">Client Information</h3>
+        <table className="w-full border text-sm mb-4 bg-white text-black">
           <tbody>
-            <tr><td className="border px-4 py-2 font-medium">Name</td><td className="border px-4 py-2">{formData.client?.name}</td></tr>
-            <tr><td className="border px-4 py-2 font-medium">Contact</td><td className="border px-4 py-2">{formData.client?.contactNumber}</td></tr>
-            <tr><td className="border px-4 py-2 font-medium">Email</td><td className="border px-4 py-2">{formData.client?.email}</td></tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium text-black">Name</td>
+              <td className="border px-4 py-2">{formData.client?.name}</td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium text-black">Contact</td>
+              <td className="border px-4 py-2">{formData.client?.contactNumber}</td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium text-black">Email</td>
+              <td className="border px-4 py-2">{formData.client?.email}</td>
+            </tr>
           </tbody>
         </table>
 
-        <h3 className="text-md font-semibold text-gray-700 mb-2">Quotation Items</h3>
+        <h3 className="text-md font-semibold text-gray-800 mb-2">Quotation Items</h3>
         <div className="space-y-2 mb-4">
           {formData.items.map((item, index) => (
             <div key={index} className="grid grid-cols-4 gap-2 items-center">
               <input
                 readOnly
                 value={item.name}
-                className="p-2 border rounded bg-gray-100"
+                className="p-2 border rounded bg-white text-black"
               />
               <input
                 type="number"
                 placeholder="Qty"
                 value={item.quantity}
                 onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                className="p-2 border rounded"
+                className="p-2 border rounded bg-white text-black"
               />
               <input
                 readOnly
                 value={`₱${item.unitPrice}`}
-                className="p-2 border rounded bg-gray-100"
+                className="p-2 border rounded bg-white text-black"
               />
               <button
                 className="bg-red-500 text-white px-3 py-1 rounded"
@@ -150,7 +168,7 @@ const EditQuotationModal = ({ quotation, onSave, onClose }) => {
 
           <div className="flex gap-2">
             <select
-              className="p-2 border rounded w-full"
+              className="p-2 border rounded w-full bg-white text-black"
               onChange={(e) => {
                 if (e.target.value) addItem(e.target.value);
                 e.target.value = '';

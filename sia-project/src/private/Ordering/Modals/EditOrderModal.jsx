@@ -62,8 +62,8 @@ const EditOrderModal = ({ order, onSave, onClose }) => {
   const selectedProductNames = formData.items.map(i => i.name);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl overflow-y-auto max-h-[90vh] text-sm">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl overflow-y-auto max-h-[90vh] text-gray-800">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Edit Order</h2>
 
         <table className="w-full border mb-4">
@@ -75,7 +75,7 @@ const EditOrderModal = ({ order, onSave, onClose }) => {
                   type="text"
                   value={new Date(order.orderDate).toLocaleString()}
                   readOnly
-                  className="w-full p-2 border rounded bg-gray-100 text-gray-600"
+                  className="w-full p-2 border rounded bg-white text-black cursor-not-allowed"
                 />
               </td>
             </tr>
@@ -87,7 +87,7 @@ const EditOrderModal = ({ order, onSave, onClose }) => {
                   name="remainingBalance"
                   value={formData.remainingBalance}
                   onChange={handleChange}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-white text-black"
                 />
               </td>
             </tr>
@@ -98,7 +98,7 @@ const EditOrderModal = ({ order, onSave, onClose }) => {
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-white text-black"
                 >
                   <option value="Pending">Pending</option>
                   <option value="Processing">Processing</option>
@@ -126,21 +126,21 @@ const EditOrderModal = ({ order, onSave, onClose }) => {
         <div className="space-y-2 mb-4">
           {formData.items.map((item, idx) => (
             <div key={idx} className="grid grid-cols-4 gap-2 items-center">
-              <input readOnly value={item.name} className="p-2 border rounded bg-gray-100" />
+              <input readOnly value={item.name} className="p-2 border rounded bg-white text-black" />
               <input
                 type="number"
                 value={item.quantity}
                 onChange={(e) => handleItemChange(idx, 'quantity', e.target.value)}
-                className="p-2 border rounded"
+                className="p-2 border rounded bg-white text-black"
               />
-              <input readOnly value={`₱${item.unitPrice}`} className="p-2 border rounded bg-gray-100" />
+              <input readOnly value={`₱${item.unitPrice}`} className="p-2 border rounded bg-white text-black" />
               <button onClick={() => removeItem(idx)} className="bg-red-500 text-white px-3 py-1 rounded">
                 Remove
               </button>
             </div>
           ))}
           <select
-            className="p-2 border rounded w-full"
+            className="p-2 border rounded w-full bg-white text-black"
             onChange={(e) => { if (e.target.value) addItem(e.target.value); e.target.value = ''; }}
           >
             <option value="">+ Add Product</option>

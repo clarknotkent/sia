@@ -1,133 +1,365 @@
 // src/private/Purchasing/Modals/AddPurchaseOrderModal.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import axios from 'axios';
+
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
 const AddPurchaseOrderModal = ({ onAdd, onClose }) => {
+  const [suppliers, setSuppliers] = useState([]);
   const [formData, setFormData] = useState({
     poID: '',
-    supplier: '',
     orderDate: '',
     status: 'Pending',
-    items: [{ name: '', quantity: 1, unitPrice: 0 }],
+    supplierID: '',
+    items: [
+      {
+        sku: '',
+        genericName: '',
+        brandName: '',
+        unitOfMeasurement: '',
+        packing: '',
+        lotNum: '',
+        expiryDate: '',
+        stock: 1,
+        unitPrice: 0,
+      },
+    ],
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sample supplier list
-  const suppliers = ['MediSupply Co.', 'PharmaDirect', 'HealthSource', 'Wellness Depot'];
-
-  // Generate PO number on mount
   useEffect(() => {
-    const today = new Date();
-    const datePart = today.toISOString().slice(0, 10).replace(/-/g, '');
-    const randomPart = Math.floor(100 + Math.random() * 900);
-    const generatedPO = `PO${datePart}-${randomPart}`;
-    setFormData(prev => ({ ...prev, poID: generatedPO }));
+    // Fetch all POs to determine the next PO number
+    axios.get(`${API}/purchasing/purchaseOrders`)
+      .then(res => {
+        const numbers = res.data
+          .map(po => parseInt((po.poID || '').replace('PO-', ''), 10))
+          .filter(n => !isNaN(n));
+        const nextNum = (numbers.length ? Math.max(...numbers) + 1 : 1);
+        const nextID = `PO-${String(nextNum).padStart(4, '0')}`;
+        setFormData(fd => ({
+          ...fd,
+          poID: nextID,
+          orderDate: new Date().toISOString().split('T')[0], // set today's date
+        }));
+      });
+
+    // fetch suppliers
+    axios
+      .get(`${API}/purchasing/suppliers`)
+      .then(res => setSuppliers(res.data))
+      .catch(err => {
+        console.error(err);
+        setError('Failed to load suppliers');
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleTopChange = e => {
+    const { name, value } = e.target;
+    setFormData(fd => ({ ...fd, [name]: value }));
   };
 
-  const handleItemChange = (index, e) => {
-    const updatedItems = [...formData.items];
-    updatedItems[index][e.target.name] = e.target.name === 'name' ? e.target.value : parseFloat(e.target.value);
-    setFormData(prev => ({ ...prev, items: updatedItems }));
+  const handleItemChange = (idx, e) => {
+    const { name, value } = e.target;
+    setFormData(fd => {
+      const items = [...fd.items];
+      items[idx][name] = name === 'stock' || name === 'unitPrice'
+        ? Math.max(0, parseFloat(value) || 0)
+        : value;
+      return { ...fd, items };
+    });
   };
 
   const addItem = () => {
-    setFormData(prev => ({
-      ...prev,
-      items: [...prev.items, { name: '', quantity: 1, unitPrice: 0 }]
+    setFormData(fd => ({
+      ...fd,
+      items: [
+        ...fd.items,
+        {
+          sku: '',
+          genericName: '',
+          brandName: '',
+          unitOfMeasurement: '',
+          packing: '',
+          lotNum: '',
+          expiryDate: '',
+          stock: 1,
+          unitPrice: 0,
+        },
+      ],
     }));
   };
 
-  const handleSubmit = () => {
-    const totalAmount = formData.items.reduce(
-      (sum, item) => sum + item.quantity * item.unitPrice,
-      0
-    );
-    onAdd({ ...formData, totalAmount });
-    onClose();
+  const removeItem = idx => {
+    setFormData(fd => ({
+      ...fd,
+      items: fd.items.filter((_, i) => i !== idx),
+    }));
   };
 
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Add Purchase Order</h2>
+  const handleSubmit = async () => {
+    if (!formData.orderDate || !formData.supplierID) {
+      return alert('Please complete all required fields.');
+    }
 
-        <input
-          className="border p-2 w-full mb-2 bg-white text-gray-800"
-          name="poID"
-          value={formData.poID}
-          disabled
-        />
+    // Prepare items as needed (include unitPrice)
+    const itemsDetailed = formData.items.map(it => ({
+      sku: it.sku,
+      name: it.genericName,
+      quantity: it.stock,
+      brandName: it.brandName,
+      unitOfMeasurement: it.unitOfMeasurement,
+      packing: it.packing,
+      lotNum: it.lotNum,
+      expiryDate: it.expiryDate,
+      unitPrice: it.unitPrice,
+    }));
 
-        <select
-          className="border p-2 w-full mb-2 bg-white text-gray-800"
-          name="supplier"
-          value={formData.supplier}
-          onChange={handleChange}
-        >
-          <option value="">Select Supplier</option>
-          {suppliers.map((s, index) => (
-            <option key={index} value={s}>{s}</option>
-          ))}
-        </select>
+    const formattedDate = formData.orderDate;
 
-        <input
-          type="date"
-          name="orderDate"
-          value={formData.orderDate}
-          onChange={handleChange}
-          className="border p-2 w-full mb-2 bg-white text-gray-800"
-        />
+    const payload = {
+      ...formData,
+      orderDate: formattedDate,
+      items: itemsDetailed,
+    };
 
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold mb-2">Items</h3>
-          {formData.items.map((item, index) => (
-            <div key={index} className="flex gap-2 mb-2">
-              <input
-                type="text"
-                name="name"
-                value={item.name}
-                onChange={(e) => handleItemChange(index, e)}
-                placeholder="Item Name"
-                className="border p-2 flex-1 bg-white text-gray-800"
-              />
-              <input
-                type="number"
-                name="quantity"
-                value={item.quantity}
-                onChange={(e) => handleItemChange(index, e)}
-                placeholder="Qty"
-                className="border p-2 w-20 bg-white text-gray-800"
-              />
-              <input
-                type="number"
-                name="unitPrice"
-                value={item.unitPrice}
-                onChange={(e) => handleItemChange(index, e)}
-                placeholder="Unit Price"
-                className="border p-2 w-24 bg-white text-gray-800"
-              />
-            </div>
-          ))}
-          <button
-            onClick={addItem}
-            className="text-sm bg-blue-500 text-white px-3 py-1 rounded"
-          >
-            + Add Item
+    try {
+      const resp = await axios.post(`${API}/purchasing/purchaseOrders`, payload);
+      onAdd(resp.data); // Pass the new order to parent
+      onClose();
+    } catch (err) {
+      alert('Failed to add purchase order: ' + (err.response?.data?.error || err.message));
+      console.error('Add PO error:', err);
+    }
+  };
+
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded shadow text-center text-gray-900">Loading…</div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded shadow text-center text-gray-900">
+          <p className="text-red-500">{error}</p>
+          <button onClick={onClose} className="mt-4 bg-red-500 text-white px-4 py-2 rounded">
+            Close
           </button>
         </div>
+      </div>
+    );
+  }
 
-        <div className="flex justify-end gap-2">
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-5xl overflow-auto max-h-[90vh]">
+        <h2 className="text-2xl font-bold text-center mb-4 text-gray-900">
+          Add New Purchase Order
+        </h2>
+
+        {/* Top section */}
+        <table className="w-full text-sm border border-gray-300 mb-6 text-gray-900">
+          <tbody>
+            <tr>
+              <td className="border px-4 py-2 font-medium">PO Number</td>
+              <td className="border px-4 py-2">
+                <input
+                  name="poID"
+                  value={formData.poID}
+                  readOnly
+                  className="w-full border px-2 py-1 bg-gray-100 text-gray-900"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium">Order Date</td>
+              <td className="border px-4 py-2">
+                <input
+                  type="date"
+                  name="orderDate"
+                  value={formData.orderDate}
+                  readOnly
+                  className="w-full border px-2 py-1 bg-gray-100 text-gray-900"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium">Status</td>
+              <td className="border px-4 py-2">
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleTopChange}
+                  className="w-full border px-2 py-1 bg-white text-gray-900"
+                >
+                  <option>Pending</option>
+                  <option>Processing</option>
+                  <option>Delivered</option>
+                  <option>Cancelled</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2 font-medium">Supplier</td>
+              <td className="border px-4 py-2">
+                <select
+                  name="supplierID"
+                  value={formData.supplierID}
+                  onChange={handleTopChange}
+                  className="w-full border px-2 py-1 bg-white text-gray-900"
+                >
+                  <option value="">Select Supplier</option>
+                  {suppliers.map(s => (
+                    <option key={s.supplierID} value={s.supplierID}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/* Bottom section: product fields */}
+        <div className="flex justify-start mb-2">
+          <h3 className="text-lg font-semibold text-gray-900">Order Items</h3>
+        </div>
+        <table className="table-auto w-full text-sm border border-gray-300 mb-4 text-gray-900 mx-auto">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="border px-2 py-1 text-center">SKU</th>
+              <th className="border px-2 py-1 text-center">Generic Name</th>
+              <th className="border px-2 py-1 text-center">Brand Name</th>
+              <th className="border px-2 py-1 text-center">Unit</th>
+              <th className="border px-2 py-1 text-center">Packing</th>
+              <th className="border px-2 py-1 text-center">Lot Number</th>
+              <th className="border px-2 py-1 text-center">Expiry Date</th>
+              <th className="border px-2 py-1 text-center">Stock</th>
+              <th className="border px-6 py-1 text-center">Unit Price</th>
+              <th className="border px-2 py-1 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {formData.items.map((it, idx) => (
+              <tr key={idx} className="text-center">
+                <td className="border px-2 py-1">
+                  <input
+                    type="text"
+                    name="sku"
+                    value={it.sku || ''}
+                    onChange={e => handleItemChange(idx, e)}
+                    className="w-full border px-1 py-1 bg-white text-gray-900 text-center"
+                  />
+                </td>
+                <td className="border px-2 py-1">
+                  <input
+                    type="text"
+                    name="genericName"
+                    value={it.genericName}
+                    onChange={e => handleItemChange(idx, e)}
+                    className="w-full border px-1 py-1 bg-white text-gray-900 text-center"
+                  />
+                </td>
+                <td className="border px-2 py-1">
+                  <input
+                    type="text"
+                    name="brandName"
+                    value={it.brandName}
+                    onChange={e => handleItemChange(idx, e)}
+                    className="w-full border px-1 py-1 bg-white text-gray-900 text-center"
+                  />
+                </td>
+                <td className="border px-2 py-1">
+                  <input
+                    type="text"
+                    name="unitOfMeasurement"
+                    value={it.unitOfMeasurement}
+                    onChange={e => handleItemChange(idx, e)}
+                    className="w-full border px-1 py-1 bg-white text-gray-900 text-center"
+                  />
+                </td>
+                <td className="border px-2 py-1">
+                  <input
+                    type="text"
+                    name="packing"
+                    value={it.packing}
+                    onChange={e => handleItemChange(idx, e)}
+                    className="w-full border px-1 py-1 bg-white text-gray-900 text-center"
+                  />
+                </td>
+                <td className="border px-2 py-1">
+                  <input
+                    type="text"
+                    name="lotNum"
+                    value={it.lotNum}
+                    onChange={e => handleItemChange(idx, e)}
+                    className="w-full border px-1 py-1 bg-white text-gray-900 text-center"
+                  />
+                </td>
+                <td className="border px-2 py-1">
+                  <input
+                    type="date"
+                    name="expiryDate"
+                    value={it.expiryDate}
+                    onChange={e => handleItemChange(idx, e)}
+                    className="w-full border px-1 py-1 bg-white text-gray-900 text-center"
+                  />
+                </td>
+                <td className="border px-2 py-1">
+                  <input
+                    type="number"
+                    name="stock"
+                    min="1"
+                    value={it.stock}
+                    onChange={e => handleItemChange(idx, e)}
+                    className="w-full border px-1 py-1 bg-white text-gray-900 text-center"
+                  />
+                </td>
+                <td className="border px-6 py-1">
+                  <input
+                    type="number"
+                    name="unitPrice"
+                    min="0"
+                    value={it.unitPrice}
+                    onChange={e => handleItemChange(idx, e)}
+                    className="w-full border px-3 py-1 bg-white text-gray-900 text-center"
+                  />
+                </td>
+                <td className="border px-2 py-1 text-center">
+                  <button
+                    onClick={() => removeItem(idx)}
+                    className="bg-red-500 text-white px-2 py-1 rounded"
+                  >
+                    &times;
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <button
+          onClick={addItem}
+          className="mb-4 bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600"
+        >
+          + Add Item
+        </button>
+
+        <div className="flex justify-end space-x-2">
           <button
-            className="bg-green-500 text-white px-4 py-2 rounded"
             onClick={handleSubmit}
+            className="bg-green-500 text-white px-5 py-2 rounded hover:bg-green-600"
           >
             Save
           </button>
           <button
-            className="bg-red-500 text-white px-4 py-2 rounded"
             onClick={onClose}
+            className="bg-red-500 text-white px-5 py-2 rounded hover:bg-red-600"
           >
             Cancel
           </button>
@@ -135,6 +367,11 @@ const AddPurchaseOrderModal = ({ onAdd, onClose }) => {
       </div>
     </div>
   );
+};
+
+AddPurchaseOrderModal.propTypes = {
+  onAdd: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default AddPurchaseOrderModal;

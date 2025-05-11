@@ -13,20 +13,22 @@ const DeliveryTable = () => {
   const [selectedDelivery, setSelectedDelivery] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const pageSize = 5;
 
   // Fetch deliveries from the backend
   const fetchDeliveries = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/delivery`); // ✅ Fetch deliveries from backend
-      setDeliveries(res.data); // Update state with fetched deliveries
+      const res = await axios.get(`${API_BASE_URL}/delivery`);
+      setDeliveries(res.data);
     } catch (err) {
       console.error("Failed to fetch deliveries:", err);
     }
   };
 
   useEffect(() => {
-    fetchDeliveries(); // Fetch deliveries on component mount
+    fetchDeliveries();
   }, []);
 
   // Handle deleting a delivery
@@ -60,17 +62,44 @@ const DeliveryTable = () => {
     }
   };
 
-  // Paginate deliveries
-  const paginated = deliveries.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-  const totalPages = Math.ceil(deliveries.length / pageSize);
+  // Filter and paginate deliveries
+  const filteredDeliveries = deliveries.filter(del =>
+    (del.deliveryID?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      del.customer?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (statusFilter ? del.status === statusFilter : true)
+  );
+  const paginated = filteredDeliveries.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const totalPages = Math.ceil(filteredDeliveries.length / pageSize);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md border">
+      <h2 className="text-xl font-bold text-gray-800 mb-4">Delivery Table</h2>
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-4">
+          <input
+            type="text"
+            placeholder="Search by Delivery ID or Customer"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="border p-2 rounded bg-white text-gray-800 w-[300px]"
+          />
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="border p-2 rounded bg-white text-gray-800"
+          >
+            <option value="">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="In Transit">In Transit</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Failed">Failed</option>
+          </select>
+        </div>
+      </div>
       <table className="w-full border text-sm text-black">
         <thead className="bg-gray-200">
           <tr>
             <th className="border p-2">Delivery ID</th>
-            <th className="border p-2">Order ID</th>
             <th className="border p-2">Customer</th>
             <th className="border p-2">Address</th>
             <th className="border p-2">Driver</th>
@@ -83,11 +112,26 @@ const DeliveryTable = () => {
           {paginated.map(del => (
             <tr key={del.deliveryID} className="text-center">
               <td className="border p-2">{del.deliveryID}</td>
-              <td className="border p-2">{del.orderID}</td>
               <td className="border p-2">{del.customer}</td>
               <td className="border p-2">{del.address}</td>
               <td className="border p-2">{del.driver || 'Unassigned'}</td>
-              <td className="border p-2">{del.status}</td>
+              <td
+                className={
+                  `border p-2 font-semibold ${
+                    del.status === "Pending"
+                      ? "text-yellow-600"
+                      : del.status === "In Transit"
+                      ? "text-blue-600"
+                      : del.status === "Delivered"
+                      ? "text-green-600"
+                      : del.status === "Failed"
+                      ? "text-red-600"
+                      : "text-gray-800"
+                  }`
+                }
+              >
+                {del.status}
+              </td>
               <td className="border p-2">{del.date}</td>
               <td className="border p-2 space-x-2 text-center">
                 <button
@@ -117,10 +161,8 @@ const DeliveryTable = () => {
         </tbody>
       </table>
 
-      {/* Pagination Component */}
       <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
-      {/* View Delivery Modal */}
       {showViewModal && selectedDelivery && (
         <ViewDeliveryModal
           delivery={selectedDelivery}
@@ -129,7 +171,6 @@ const DeliveryTable = () => {
         />
       )}
 
-      {/* Edit Delivery Modal */}
       {showEditModal && selectedDelivery && (
         <EditDeliveryModal
           delivery={selectedDelivery}

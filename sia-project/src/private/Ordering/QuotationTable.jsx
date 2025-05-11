@@ -131,14 +131,14 @@ const QuotationTable = () => {
         </button>
       </div>
 
-      <table className="w-full border-collapse border border-gray-300 text-gray-800 text-sm">
+      <table className="w-full border-collapse border border-gray-300 text-gray-800 text-sm text-center">
         <thead className="bg-gray-200">
-          <tr>
-            <th className="border p-2 cursor-pointer" onClick={() => toggleSort('quotationID')}>Quotation ID</th>
-            <th className="border p-2">Client</th>
-            <th className="border p-2">Date</th>
-            <th className="border p-2 text-right">Total</th>
-            <th className="border p-2">Status</th>
+          <tr className="text-center">
+            <th className="border p-2 cursor-pointer text-center" onClick={() => toggleSort('quotationID')}>Quotation ID</th>
+            <th className="border p-2 text-center">Client</th>
+            <th className="border p-2 text-center">Date</th>
+            <th className="border p-2 text-center">Total</th>
+            <th className="border p-2 text-center">Status</th>
             <th className="border p-2 text-center">Actions</th>
           </tr>
         </thead>
@@ -149,14 +149,40 @@ const QuotationTable = () => {
             </tr>
           ) : (
             paginated.map(q => (
-              <tr key={q.quotationID} className="hover:bg-gray-100">
-                <td className="border p-2">{q.quotationID}</td>
-                <td className="border p-2">{q.client?.name}</td>
-                <td className="border p-2">
-                  {q.quotationDate || ''}
+              <tr key={q.quotationID} className="hover:bg-gray-100 text-center">
+                <td className="border p-2 text-center">{q.quotationID}</td>
+                <td className="border p-2 text-center">{q.client?.name}</td>
+                <td className="border p-2 text-center">
+                  {q.quotationDate
+                    ? (() => {
+                        const d = new Date(q.quotationDate);
+                        const mm = String(d.getMonth() + 1).padStart(2, '0');
+                        const dd = String(d.getDate()).padStart(2, '0');
+                        const yyyy = d.getFullYear();
+                        const hh = String(d.getHours()).padStart(2, '0');
+                        const min = String(d.getMinutes()).padStart(2, '0');
+                        return `${mm}-${dd}-${yyyy} | ${hh}:${min}`;
+                      })()
+                    : ''}
                 </td>
-                <td className="border p-2 text-right">₱{q.totalAmount?.toLocaleString()}</td>
-                <td className="border p-2">{q.status}</td>
+                <td className="border p-2 text-center">₱{q.totalAmount?.toLocaleString()}</td>
+                <td
+                  className={
+                    `border p-2 font-semibold text-center ${
+                      q.status === "Pending"
+                        ? "text-yellow-600"
+                        : q.status === "Approved"
+                        ? "text-green-600"
+                        : q.status === "Rejected"
+                        ? "text-red-600"
+                        : q.status === "Converted"
+                        ? "text-blue-600"
+                        : "text-gray-800"
+                    }`
+                  }
+                >
+                  {q.status}
+                </td>
                 <td className="border p-2 text-center">
                   <div className="flex justify-center items-center space-x-2">
                     <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" onClick={() => openModal(q, 'view')}>View</button>

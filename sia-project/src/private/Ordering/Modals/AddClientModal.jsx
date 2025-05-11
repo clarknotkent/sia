@@ -36,8 +36,8 @@ const AddClientModal = ({ onAdd, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">Add New Company Client</h2>
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg text-gray-800">
+        <h2 className="text-2xl font-bold mb-4 text-center">Add New Company Client</h2>
 
         <table className="w-full text-sm border border-gray-300 mb-4">
           <tbody>

@@ -1,3 +1,4 @@
+//src/inventory/AddProductModal.jsx
 import { useState, useRef } from "react";
 import axios from "axios";
 import PropTypes from "prop-types";

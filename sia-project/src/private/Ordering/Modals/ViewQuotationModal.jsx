@@ -44,26 +44,38 @@ const ViewQuotationModal = ({ quotation, onClose, fetchQuotations }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Quotation Details</h2>
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl text-gray-800">
+        <h2 className="text-2xl font-bold mb-4">Quotation Details</h2>
         <p><strong>ID:</strong> {quotationID}</p>
         <p><strong>Date:</strong> {quotationDate ? formatDateTime(quotationDate) : ''}</p>
         <p><strong>Status:</strong> {status}</p>
 
-        <h3 className="mt-4 text-lg font-semibold text-gray-700">Client</h3>
+        <h3 className="mt-4 text-lg font-semibold">Client</h3>
         <p><strong>Name:</strong> {client?.name}</p>
         <p><strong>Contact:</strong> {client?.contactPerson} | {client?.contactNumber}</p>
         <p><strong>Email:</strong> {client?.email}</p>
 
         <h3 className="mt-4 text-lg font-semibold text-gray-700">Items</h3>
-        <ul className="text-sm">
-          {items.map((item, idx) => (
-            <li key={idx} className="border-b py-1">
-              {item.name} — {item.quantity} x ₱{item.unitPrice}
-            </li>
-          ))}
-        </ul>
-
+        <table className="w-full text-sm border border-gray-300 mb-6">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="border p-2 text-left">Item</th>
+              <th className="border p-2 text-right">Qty</th>
+              <th className="border p-2 text-right">Unit Price</th>
+              <th className="border p-2 text-right">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item, idx) => (
+              <tr key={idx} className="hover:bg-gray-50">
+                <td className="border p-2">{item.name}</td>
+                <td className="border p-2 text-right">{item.quantity}</td>
+                <td className="border p-2 text-right">₱{Number(item.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                <td className="border p-2 text-right">₱{(item.quantity * item.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
         <p className="mt-4 font-bold text-right">Total: ₱{totalAmount?.toLocaleString()}</p>
 
         <div className="flex justify-end mt-6 gap-2">

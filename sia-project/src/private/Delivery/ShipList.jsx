@@ -18,10 +18,7 @@ const ShipList = () => {
   const fetchOrders = async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/orders/orders`);
-      const forDeliveryOrders = res.data.filter(
-        (o) => o.status === "For Delivery" // ✅ Include all "For Delivery" orders
-      );
-      setOrders(forDeliveryOrders);
+      setOrders(res.data); // <-- Show all orders, not just "For Delivery"
     } catch (err) {
       console.error("Failed to fetch orders:", err);
     }
@@ -81,7 +78,7 @@ const ShipList = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="border p-2 rounded"
+            className="border p-2 rounded bg-white text-gray-800"
           >
             <option value="">All Status</option>
             <option value="For Delivery">For Delivery</option>
@@ -122,13 +119,13 @@ const ShipList = () => {
                     View
                   </button>
                   <button
-                    className={`px-3 py-1 rounded ${
-                      order.deliveryStatus === "Sent"
-                        ? "bg-gray-400 cursor-not-allowed text-white"
-                        : "bg-red-600 hover:bg-red-700 text-white"
+                    className={`px-3 py-1 rounded text-white ${
+                      order.status === "Delivered"
+                        ? "bg-red-600 hover:bg-red-700"
+                        : "bg-gray-400 cursor-not-allowed"
                     }`}
                     onClick={() => handleDelete(order.orderID)}
-                    disabled={order.deliveryStatus === "Sent"}
+                    disabled={order.status !== "Delivered"}
                   >
                     Delete
                   </button>

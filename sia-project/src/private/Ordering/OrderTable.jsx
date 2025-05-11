@@ -141,7 +141,7 @@ const OrderTable = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="border p-2 rounded"
+            className="border p-2 rounded bg-white text-gray-800"
           >
             <option value="">All Status</option>
             <option value="Pending">Pending</option>
@@ -159,26 +159,26 @@ const OrderTable = () => {
         </button>
       </div>
 
-      <table className="w-full border-collapse border border-gray-300 text-sm text-gray-800">
+      <table className="w-full border-collapse border border-gray-300 text-sm text-gray-800 text-center">
         <thead className="bg-gray-200">
-          <tr>
-            <th className="border p-2 cursor-pointer" onClick={() => toggleSort('orderID')}>Order ID</th>
-            <th className="border p-2">Client</th>
-            <th className="border p-2">Order Date</th>
-            <th className="border p-2 text-right">Total</th>
-            <th className="border p-2 text-right">Remaining</th>
-            <th className="border p-2">Status</th>
-            <th className="border p-2">Delivery</th>
-            <th className="border p-2">Quotation</th>
+          <tr className="text-center">
+            <th className="border p-2 cursor-pointer text-center" onClick={() => toggleSort('orderID')}>Order ID</th>
+            <th className="border p-2 text-center">Client</th>
+            <th className="border p-2 text-center">Order Date</th>
+            <th className="border p-2 text-center">Total</th>
+            <th className="border p-2 text-center">Remaining</th>
+            <th className="border p-2 text-center">Status</th>
+            <th className="border p-2 text-center">Delivery</th>
+            <th className="border p-2 text-center">Quotation</th>
             <th className="border p-2 text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
           {paginatedOrders.map(order => (
-            <tr key={order.orderID} className="hover:bg-gray-100">
-              <td className="border p-2">{order.orderID}</td>
-              <td className="border p-2">{order.client?.name}</td>
-              <td className="border p-2">
+            <tr key={order.orderID} className="hover:bg-gray-100 text-center">
+              <td className="border p-2 text-center">{order.orderID}</td>
+              <td className="border p-2 text-center">{order.client?.name}</td>
+              <td className="border p-2 text-center">
                 {order.orderDate ? (() => {
                   const d = new Date(order.orderDate);
                   const mm = String(d.getMonth() + 1).padStart(2, '0');
@@ -189,9 +189,25 @@ const OrderTable = () => {
                   return `${mm}-${dd}-${yyyy} | ${hh}:${min}`;
                 })() : ''}
               </td>
-              <td className="border p-2 text-right">₱{order.totalAmount?.toLocaleString() || '0.00'}</td>
-              <td className="border p-2 text-right">₱{order.remainingBalance?.toLocaleString() || '0.00'}</td>
-              <td className="border p-2">{order.status}</td>
+              <td className="border p-2 text-center">₱{order.totalAmount?.toLocaleString() || '0.00'}</td>
+              <td className="border p-2 text-center">₱{order.remainingBalance?.toLocaleString() || '0.00'}</td>
+              <td
+                className={
+                  `border p-2 font-semibold text-center ${
+                    order.status === "Pending"
+                      ? "text-yellow-600"
+                      : order.status === "Processing"
+                      ? "text-blue-600"
+                      : order.status === "For Delivery"
+                      ? "text-green-600"
+                      : order.status === "Refunded" || order.status === "Cancelled"
+                      ? "text-red-600"
+                      : "text-gray-800"
+                  }`
+                }
+              >
+                {order.status}
+              </td>
               <td className="border p-2 text-center">
                 {order.deliveryStatus === 'Sent' ? (
                   <span className="text-green-600 font-semibold">Sent</span>
@@ -199,7 +215,7 @@ const OrderTable = () => {
                   <span className="text-yellow-600 font-medium">Not Sent</span>
                 )}
               </td>
-              <td className="border p-2">{order.quotationID || '—'}</td>
+              <td className="border p-2 text-center">{order.quotationID || '—'}</td>
               <td className="border p-2 text-center space-x-1">
                 <button className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                   onClick={() => openModal(order, 'view')}>View</button>

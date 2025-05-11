@@ -27,7 +27,14 @@ let staffList = [
 
 // Get all staff
 const getAllStaff = (req, res) => {
-  res.json(staffList);
+  let filtered = staffList;
+  if (req.query.role) {
+    filtered = filtered.filter(s => s.role === req.query.role);
+  }
+  if (req.query.status) {
+    filtered = filtered.filter(s => s.status === req.query.status);
+  }
+  res.json(filtered);
 };
 
 // Add new staff

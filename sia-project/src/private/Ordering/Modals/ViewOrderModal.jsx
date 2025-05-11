@@ -55,7 +55,7 @@ const ViewOrderModal = ({ order, onClose, refreshParent }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl relative">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl text-gray-800">
         <div ref={printRef}>
           <h1 className="text-2xl font-bold text-center mb-1">Health Key Pharma</h1>
           <h2 className="text-xl text-center mb-4">Order Invoice</h2>
